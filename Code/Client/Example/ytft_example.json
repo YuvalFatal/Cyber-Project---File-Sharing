@@ -1,0 +1,29 @@
+{
+"Announce": "127.0.0.1",
+"Info":
+    {
+        "Name": "Harry Potter",
+        "Piece Length": 262144,
+        "Files":
+        [
+            {
+                "Path": "harry_potter.txt",
+                "Length": 1002,
+                "Hash": "2117c215addda09e3c5e8133a092d6ed6ac3b5b4",
+                "Pieces Hash": ["2117c215addda09e3c5e8133a092d6ed6ac3b5b4", "aa35e05bb164ddab16258161f2ec55ec60b2f7b0"]
+            },
+            {
+                "Path": "harry_potter.mp4",
+                "Length": 1003432,
+                "Hash": "aa35e05bb164ddab16258161f2ec55ec60b2f7b0",
+                "Pieces Hash": ["2117c215addda09e3c5e8133a092d6ed6ac3b5b4", "aa35e05bb164ddab16258161f2ec55ec60b2f7b0"]
+            },
+            {
+                "Path": "Music/harry_potter.mp3",
+                "Length": 102,
+                "Hash": "9412f1834cadce7272db3833f41351860e41cc4b",
+                "Pieces Hash": ["2117c215addda09e3c5e8133a092d6ed6ac3b5b4", "aa35e05bb164ddab16258161f2ec55ec60b2f7b0"]
+            }
+        ]
+    }
+}
