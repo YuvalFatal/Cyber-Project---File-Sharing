@@ -1,5 +1,5 @@
 """
-Contain the yftf creator class.
+Containing the yftf creator class.
 """
 import os
 import json
@@ -10,25 +10,24 @@ class YftfCreator(object):
     """
     Class that makes the yftf file for the file/s you want to share.
     """
-    path = ""
-    piece_length = 262144
-    is_file = False
-
     def __init__(self, path, yftf_path):
         """
-        Create the yftf file.
+        Creating the yftf file.
         """
-        exist = self.is_exist(path, yftf_path)
+        self.piece_length = 262144
+        self.is_file = False
 
-        if exist[0]:
+        exists = self.is_exist(path, yftf_path)
+
+        if exists[0]:
             self.path = path
             self.create_yftf(yftf_path)
         else:
-            print exist[1]
+            print exists[1]
 
     def is_exist(self, path, yftf_path):
         """
-        Check if the file or directory exists.
+        Checking if the file or directory exists.
         """
         if os.path.isfile(path):
             self.is_file = True
@@ -43,7 +42,7 @@ class YftfCreator(object):
 
     def get_data(self):
         """
-        Organize all the data that needs for the yftf file.
+        Organizing all the data that needs for the yftf file.
         """
         yftf_data = dict()
         yftf_data['Announce'] = 'url...'
@@ -72,12 +71,16 @@ class YftfCreator(object):
         """
         yftf_data = self.get_data()
 
-        yftf = open(path + '\\' + ''.join(yftf_data['Info']['Name'].split('.')[:-1]) + '.yftf', 'w')
+        if self.is_file:
+            yftf = open(path + '\\' + ''.join(yftf_data['Info']['Name'].split('.')[:-1]) + '.yftf', 'w')
+        else:
+            yftf = open(path + '\\' + yftf_data['Info']['Name'] + '.yftf', 'w')
+
         yftf.write(json.dumps(yftf_data))
 
     def get_files_info(self, path):
         """
-        Organize all the files info.
+        Organizing all the files info.
         """
         files = []
 
@@ -99,7 +102,7 @@ class YftfCreator(object):
 
     def get_file_info(self, path):
         """
-        Organize all the file info.
+        Organizing all the file info.
         """
         file_info = dict()
         file_data = open(path, 'rb').read()
