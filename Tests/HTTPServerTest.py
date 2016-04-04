@@ -1,5 +1,5 @@
-import tornado.httpserver
-import tornado.ioloop
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
 
 
 def handle_request(request):
@@ -21,6 +21,12 @@ def handle_request(request):
     request.write(response)
     request.finish()
 
-http_server = tornado.httpserver.HTTPServer(handle_request)
-http_server.listen(80)
-tornado.ioloop.IOLoop.instance().start()
+
+def main(port):
+    http_server = HTTPServer(handle_request)
+    http_server.listen(port)
+    IOLoop.instance().start()
+
+
+if __name__ == '__main__':
+    main(80)

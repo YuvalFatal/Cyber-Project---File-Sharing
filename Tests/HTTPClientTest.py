@@ -1,9 +1,7 @@
 from tornado.ioloop import IOLoop
-from tornado import gen
-from tornado.httpclient import AsyncHTTPClient
-from tornado.httpclient import HTTPRequest
+from tornado import gen, queues
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from tornado.httputil import HTTPHeaders
-from tornado import queues
 import time
 
 
