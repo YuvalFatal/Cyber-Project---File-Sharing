@@ -10,12 +10,14 @@ class YftfCreator(object):
     """
     Class that makes the yftf file for the file/s you want to share.
     """
-    def __init__(self, path, yftf_path):
+    def __init__(self, path, yftf_path, tracker_url):
         """
         Creating the yftf file.
         """
         self.piece_length = 262144
         self.is_file = False
+        self.num_pieces = 0
+        self.tracker_url = tracker_url
 
         exists = self.is_exist(path, yftf_path)
 
@@ -45,7 +47,7 @@ class YftfCreator(object):
         Organizing all the data that needs for the yftf file.
         """
         yftf_data = dict()
-        yftf_data['Announce'] = 'url...'
+        yftf_data['Announce'] = self.tracker_url
         yftf_data['Info'] = dict()
 
         yftf_data['Info']['Name'] = self.path.split('\\')[-1]
@@ -62,6 +64,8 @@ class YftfCreator(object):
             return yftf_data
 
         yftf_data['Info']['Files'] = files_data
+
+        yftf_data['Info']['Num Pieces'] = self.num_pieces
 
         return yftf_data
 
@@ -124,6 +128,10 @@ class YftfCreator(object):
 
         for piece in data[::self.piece_length]:
             pieces_hashes.append(YftfCreator.get_data_hash(piece))
+
+            self.num_pieces += 1
+
+        self.num_pieces -= 1
 
         return pieces_hashes
 
