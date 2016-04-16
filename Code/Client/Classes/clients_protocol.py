@@ -4,7 +4,7 @@ import hashlib
 
 class ClientProtocol(object):
     @staticmethod
-    def handle_request(request, yftf_files):
+    def handle_request(request, yftf_files, shared_files_dir_path):
         info_hash = request[0:40]
         piece_index = int(request[40:48])
 
@@ -25,9 +25,10 @@ class ClientProtocol(object):
         if not file_path or not os.path.exists(file_path):
             return None
 
-        shared_file = open(file_path, 'rb')
+        shared_file = open(os.path.join(shared_files_dir_path, file_path), 'rb')
         shared_file.seek(file_piece_index * yftf_data["Info"]["Piece Length"])
         data = shared_file.read(yftf_data["Info"]["Piece Length"])
+        shared_file.close()
 
         return info_hash + data
 
@@ -36,7 +37,7 @@ class ClientProtocol(object):
         return info_hash + str(piece_index).zfill(8)
 
     @staticmethod
-    def handle_response(response, requests, yftf_files):
+    def handle_response(response, requests, yftf_files, shared_files_dir_path):
         info_hash = response[0:40]
 
         if info_hash not in yftf_files.keys() or info_hash in requests.keys():
@@ -67,8 +68,9 @@ class ClientProtocol(object):
         if not file_path:
             return None
 
-        shared_file = open(file_path, 'wb')
+        shared_file = open(os.path.join(shared_files_dir_path, file_path), 'wb')
         shared_file.seek(file_piece_index * yftf_data["Info"]["Piece Length"])
         shared_file.write(data)
+        shared_file.close()
 
         return piece_index
