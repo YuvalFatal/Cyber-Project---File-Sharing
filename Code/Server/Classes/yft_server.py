@@ -2,7 +2,7 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
 
-class YFTHTTPServer(object):
+class YFTServer(object):
     def __init__(self, listen_port, http_version):
         self.http_version = http_version
         self.http_server = HTTPServer(self.handle_request)
