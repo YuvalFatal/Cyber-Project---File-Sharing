@@ -4,7 +4,7 @@ from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from tornado.httputil import HTTPHeaders
 
 
-class YFTClient(object):
+class YFTHTTPClient(object):
     def __init__(self, num_workers, queue_size):
         self.num_workers = num_workers
         self.queue_size = queue_size
@@ -28,7 +28,7 @@ class YFTClient(object):
             req = yield self.queue.get()
 
             try:
-                yield self.http_client.fetch(req, YFTClient.handle_response)
+                yield self.http_client.fetch(req, YFTHTTPClient.handle_response)
             except Exception:
                 pass
             finally:
