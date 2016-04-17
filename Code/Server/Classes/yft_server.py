@@ -1,28 +1,27 @@
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
+import client_server_protocol
 
 
 class YFTServer(object):
-    def __init__(self, listen_port, http_version):
+    def __init__(self, listen_port, http_version, saved_tables_path):
+        self.protocol = client_server_protocol.ClientServerProtocol(saved_tables_path)
+
         self.http_version = http_version
         self.http_server = HTTPServer(self.handle_request)
 
         self.http_server.listen(listen_port)
 
     def handle_request(self, request):
-        for key in request.headers.keys(): #temp
-            print key + ": " + request.headers[key] #temp
+        headers = self.protocol.handle_request(request.headers, request.body)
 
-        body = "test" #temp
-        headers = {"YFT=d": "d", "Connection": "keep-alive"} #temp
-
-        response = self.write_response(headers, body)
+        response = self.write_response(headers)
 
         request.write(response)
         request.finish()
 
-    def write_response(self, headers={}, body=""):
-        response = self.http_version + " 200 OK\r\n" #temp
+    def write_response(self, headers, body=""):
+        response = self.http_version + " 200 OK\r\n"
 
         for header in headers:
             response += header + ": " + str(headers[header]) + "\r\n"

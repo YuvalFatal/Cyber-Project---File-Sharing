@@ -3,8 +3,8 @@ import hashlib
 
 class ClientServerProtocol(object):
     @staticmethod
-    def new_share_request(yftf_data, peer_id, peer_ip):
-        return {"YFT-Peer-id": peer_id, "YFT-Peer-ip": peer_ip, "YFT-yftf-Hash": hashlib.sha1(yftf_data).hexdigest(), "YFT-Peer-Status": str(0), "YFT-Upload-Piece": str(1)}
+    def new_share_request(yftf_data, peer_id, peer_ip, port):
+        return {"YFT-Peer-id": peer_id, "YFT-Peer-ip": peer_ip, "YFT-yftf-Hash": hashlib.sha1(yftf_data).hexdigest(), "YFT-Peer-Status": str(0), "YFT-Upload-Piece": str(1), "YFT-Port": str(port)}
 
     @staticmethod
     def download_request(info_hash, peer_id, peer_ip, request_piece_index, finished_piece_index=None):
