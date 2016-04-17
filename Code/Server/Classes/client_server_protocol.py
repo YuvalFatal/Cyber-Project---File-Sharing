@@ -44,7 +44,7 @@ class ClientServerProtocol(object):
 
     @staticmethod
     def handle_finished_piece(yftf_files, request_headers):
-        yftf_files[request_headers["YFT-Info-Hash"]].add_piece(map(int, request_headers["YFT-Finished-Piece-Index"]))
+        yftf_files[request_headers["YFT-Info-Hash"]].add_piece(map(int, request_headers["YFT-Finished-Piece-Index"].split(', ')))
 
     @staticmethod
     def handle_downloader_request(yftf_files, request_headers):
