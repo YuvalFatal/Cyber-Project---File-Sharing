@@ -1,7 +1,10 @@
+import hashlib
+
+
 class ClientServerProtocol(object):
     @staticmethod
-    def new_share_request():
-        pass
+    def new_share_request(yftf_data, peer_id, peer_ip):
+        return {"YFT-Peer-id": peer_id, "YFT-Peer-ip": peer_ip, "YFT-yftf-Hash": hashlib.sha1(yftf_data).hexdigest(), "YFT-Peer-Status": str(0), "YFT-Upload-Piece": str(1)}
 
     @staticmethod
     def download_request(info_hash, peer_id, peer_ip, request_piece_index, finished_piece_index=None):
@@ -21,8 +24,8 @@ class ClientServerProtocol(object):
     @staticmethod
     def upload_request(info_hash, peer_id, peer_ip, port, finished_piece_index=None):
         headers = ClientServerProtocol.basic_request(info_hash, peer_id, peer_ip)
-
         headers.update({"YFT-Peer-Status": str(1), "YFT-Upload-Piece": str(1), "YFT-Port": str(port)})
+
         if finished_piece_index:
             if isinstance(finished_piece_index, list):
                 finished_piece_index = ', '.join(finished_piece_index)
