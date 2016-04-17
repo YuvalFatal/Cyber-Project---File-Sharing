@@ -6,8 +6,8 @@ import os
 
 class ClientServerProtocol(object):
     def __init__(self, saved_tables_path):
-        if os.path.isfile("server_saved_data.obj"):
-            data_save_file = open("server_saved_data.obj", 'rb')
+        if os.path.isfile("data_save.obj"):
+            data_save_file = open("data_save.obj", 'rb')
             saved_data = json.loads(data_save_file.read())
             data_save_file.close()
 
@@ -112,7 +112,7 @@ class ClientServerProtocol(object):
         return {"YFT-Info-Hash": info_hash, "YFT-Type": str(1)}
 
     def __del__(self):
-        data_save_file = open("server_saved_data.obj", 'wb')
+        data_save_file = open("data_save.obj", 'wb')
 
         data_save_file.write(json.dumps({"saved_tables_path": self.saved_tables_path, "yftf_files_info_hash": self.yftf_files.keys()}))
         data_save_file.close()
