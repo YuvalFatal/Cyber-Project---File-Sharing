@@ -1,13 +1,12 @@
 import json
-import hashlib
 import os
 import peer
 
 
 class SharedFileTable(object):
-    def __init__(self, yftf_files_dir_path, yftf_name, saved_tables_path):
-        if os.path.isfile(os.path.join(saved_tables_path, yftf_name + ".obj")):
-            table_data = open(os.path.join(saved_tables_path, yftf_name + ".obj"), 'rb')
+    def __init__(self, info_hash, saved_tables_path, yftf_data=""):
+        if os.path.isfile(os.path.join(saved_tables_path, info_hash + ".obj")):
+            table_data = open(os.path.join(saved_tables_path, info_hash + ".obj"), 'rb')
             self.__dict__ = json.loads(table_data.read())
             table_data.close()
 
@@ -19,14 +18,11 @@ class SharedFileTable(object):
             return
 
         self.saved_tables_path = saved_tables_path
-        self.yftf_name = yftf_name
-
-        with open(os.path.join(yftf_files_dir_path, self.yftf_name + ".yftf"), 'r') as yftf_file:
-            self.yftf_data = yftf_file.read()
+        self.info_hash = info_hash
+        self.yftf_data = yftf_data
 
         self.yftf_json = json.loads(self.yftf_data)
 
-        self.info_hash = hashlib.sha1(json.dumps(self.yftf_json["Info"])).hexdigest()
         self.num_pieces = self.yftf_json["Info"]["Num Pieces"]
         self.peers = dict()
 
@@ -59,11 +55,14 @@ class SharedFileTable(object):
 
         return None
 
+    def remove_peer(self, peer_id):
+        del self.peers[peer_id]
+
     def __str__(self):
         return ', '.join([self.yftf_data, self.info_hash, str(self.num_pieces), str(self.peers)])
 
     def __del__(self):
-        table_data = open(os.path.join(self.saved_tables_path, self.yftf_name + ".obj"), 'wb')
+        table_data = open(os.path.join(self.saved_tables_path, self.info_hash + ".obj"), 'wb')
         for peer_id in self.peers.keys():
             self.peers[peer_id] = self.peers[peer_id].__dict__
 
