@@ -35,3 +35,17 @@ class YFTServer(object):
 
     def start_server(self):
         IOLoop.instance().start()
+
+
+def main():
+    listen_port = raw_input("What is the port you want to listen on?")
+    http_version = "HTTP/1.1"
+    saved_tables_path = raw_input("What is the path you want to save the tables to?")
+
+    server = YFTServer(listen_port, http_version, saved_tables_path)
+
+    server.start_server()
+
+
+if __name__ == "__main__":
+    main()

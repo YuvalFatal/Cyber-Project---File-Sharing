@@ -14,6 +14,9 @@ class ClientProtocol(object):
         yftf_data = yftf_files[info_hash][0]
         shared_files_dir_path = yftf_files[info_hash][1]
 
+        file_path = str()
+        file_piece_index = int()
+
         pieces_counter = -1
         for shared_file_info in yftf_data["Info"]["Files"]:
             pieces_counter += len(shared_file_info["Pieces Hash"])
@@ -50,6 +53,10 @@ class ClientProtocol(object):
 
         data = response[40:40 + yftf_data["Info"]["Piece Length"]]
         data_hash = hashlib.sha1(data).hexdigest()
+
+        file_path = str()
+        file_piece_index = int()
+        piece_index = int()
 
         for piece_index in pieces_index_requested:
             pieces_counter = -1

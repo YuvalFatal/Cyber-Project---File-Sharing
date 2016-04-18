@@ -27,7 +27,7 @@ class ClientServerProtocol(object):
         if not request_headers:
             return {"YFT-Error": "You probably miss some headers"}
 
-        if ["YFT-Peer-id", "YFT-Peer-Status", "YFT-Upload-Piece", "YFT-yftf-Hash"] in request_headers.keys():
+        if ["YFT-Peer-id", "YFT-Peer-Status", "YFT-Upload-Piece", "YFT-yftf-Hash", "YFT-Port"] in request_headers.keys():
             return self.handle_new_share(request_headers, request_body)
 
         if ["YFT-Info-Hash", "YFT-Peer-id", "YFT-Peer-ip", "YFT-Peer-Status", "YFT-Port"] in request_headers.keys():
@@ -76,7 +76,7 @@ class ClientServerProtocol(object):
 
         table.set_peer_waiting(request_headers["YFT-Peer-id"], int(request_headers["YFT-Port"]))
 
-        return {"YFT-Info-Hash": table.get_info_hash(), "YFT-Type": str(1)}
+        return {"YFT-Info-Hash": table.get_info_hash(), "YFT-Type": str(1), "YFT-Port": str(request_headers["YFT-Port"])}
 
     def handle_new_share(self, request_headers, request_body):
         if not request_body:
@@ -109,7 +109,7 @@ class ClientServerProtocol(object):
 
         self.yftf_files.update({info_hash: table})
 
-        return {"YFT-Info-Hash": info_hash, "YFT-Type": str(1)}
+        return {"YFT-Info-Hash": info_hash, "YFT-Type": str(1), "YFT-Port": str(request_headers["YFT-Port"])}
 
     def __del__(self):
         data_save_file = open("data_save.obj", 'wb')

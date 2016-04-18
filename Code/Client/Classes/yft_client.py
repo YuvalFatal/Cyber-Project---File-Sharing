@@ -1,49 +1,58 @@
-from tornado.ioloop import IOLoop
-from tornado import gen, queues
-from tornado.httpclient import AsyncHTTPClient, HTTPRequest
-from tornado.httputil import HTTPHeaders
+import socket
+import random
+import string
 
 
 class YFTClient(object):
-    def __init__(self, num_workers, queue_size):
-        self.num_workers = num_workers
-        self.queue_size = queue_size
+    def __init__(self):
+        self.peer_id = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(20))
+        self.peer_ip = YFTClient.get_host_ip()
 
-        self.queue = queues.Queue(self.queue_size)
+        self.yftf_files = dict()
 
-        AsyncHTTPClient.configure(None, max_clients=self.num_workers)
-        self.http_client = AsyncHTTPClient()
+        self.thread_counter = 0
+        self.start_port_from = 6000
+        self.num_port_per_thread = 10
+
+        self.downloads_dir_path = raw_input("Where do you want your downloads to be saved?")
+
+        while True:
+            command = raw_input("What do you want to do next?")
+
+            if command is str(0):
+                self.new_download()
+                continue
+
+            if command is str(1):
+                self.new_share()
+                continue
+
+            if command is str(2):
+                self.stop_upload()
+                continue
+
+    def new_download(self):
+        pass
+
+    def new_share(self):
+        pass
+
+    def stop_upload(self):
+        pass
 
     @staticmethod
-    def handle_response(response):
-        if response.error:
-            print "Error:", response.error #temp
-        else:
-            for key in response.headers.keys(): #temp
-                print key + ": " + response.headers[key] #temp
+    def get_host_ip():
+            sock = socket.socket()
+            sock.connect(("google.com", 80))
+            ip = sock.getsockname()[0]
+            sock.close()
 
-    @gen.coroutine
-    def worker(self):
-        while True:
-            req = yield self.queue.get()
+            return ip
 
-            try:
-                yield self.http_client.fetch(req, YFTClient.handle_response)
-            except Exception:
-                pass
-            finally:
-                self.queue.task_done()
 
-    @gen.coroutine
-    def do_work(self):
-        req = HTTPRequest(url="http://127.0.0.1:80", method="GET", body="test", headers=HTTPHeaders({"YFT": "test", "Connection": "keep-alive"}), allow_nonstandard_methods=True)#temp
+def main():
+    YFTClient()
 
-        for i in range(self.num_workers):
-            IOLoop.current().spawn_callback(self.worker)
 
-        while True: #temp
-            yield self.queue.put(req) #temp
-        yield self.queue.join() #temp
-
-    def start_client(self):
-        IOLoop.current().run_sync(self.do_work)
+if __name__ == "__main__":
+    main()
