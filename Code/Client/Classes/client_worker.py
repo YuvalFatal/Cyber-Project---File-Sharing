@@ -12,7 +12,7 @@ class ClientWorker(object):
     def __init__(self, command, yftf_files, info_hash, peer_id, peer_ip, port_range, num_workers, queue_size):
         self.peer_id = peer_id
         self.peer_ip = peer_ip
-        self.port_range_in_use = dict(zip(port_range, [False] * 10))
+        self.port_range_in_use = dict(zip(port_range, [False] * len(port_range)))
 
         self.yftf_files = yftf_files
         self.info_hash = info_hash
@@ -23,6 +23,7 @@ class ClientWorker(object):
         self.queue_size = queue_size
 
         self.num_requests = 0
+        self.first_uploader = 0
         self.command = command
 
         self.queue = queues.Queue(self.queue_size)
@@ -147,11 +148,13 @@ class ClientWorker(object):
 
             return req
 
-        elif self.num_requests is 0 and self.command is 1:
+        elif self.first_uploader is 0 and self.command is 1:
             port = self.find_unused_port()
 
             if not port:
                 return
+
+            self.first_uploader += 1
 
             return self.basic_request(client_server_protocol.ClientServerProtocol.new_share_request(self.yftf_files[self.info_hash][0], self.peer_id, self.peer_ip, port))
 
@@ -204,7 +207,12 @@ class ClientWorker(object):
             IOLoop.current().spawn_callback(self.worker)
 
         while True:
-            yield self.queue.put(self.request())
+            req = self.request()
+
+            if not req:
+                continue
+
+            yield self.queue.put(req)
 
         yield self.queue.join()
 

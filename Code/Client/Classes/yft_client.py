@@ -25,15 +25,15 @@ class YFTClient(object):
         while True:
             command = raw_input("What do you want to do next?")
 
-            if command is str(0):
+            if command == str(0):
                 self.new_download()
                 continue
 
-            if command is str(1):
+            if command == str(1):
                 self.new_share()
                 continue
 
-            if command is str(2):
+            if command == str(2):
                 self.stop_upload()
                 continue
 
@@ -51,7 +51,7 @@ class YFTClient(object):
 
         info_hash = hashlib.sha1(yftf_json["Info"]).hexdigest()
 
-        self.yftf_files.update({info_hash: [yftf_data, self.downloads_dir_path]})
+        self.yftf_files.update({info_hash: [yftf_json, self.downloads_dir_path]})
 
         worker = client_worker.ClientWorker(0, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
 
@@ -67,16 +67,16 @@ class YFTClient(object):
 
         yftf_creator.YftfCreator(path, yftf_path, tracker_url)
 
-        yftf_file = open(yftf_path, 'r')
+        yftf_file = open(os.path.join(yftf_path, path.split('\\')[-1].split('.')[0] + ".yftf"), 'r')
         yftf_data = yftf_file.read()
         yftf_json = json.loads(yftf_data)
         yftf_file.close()
 
-        info_hash = hashlib.sha1(yftf_json["Info"]).hexdigest()
+        info_hash = hashlib.sha1(json.dumps(yftf_json["Info"])).hexdigest()
 
-        self.yftf_files.update({info_hash: [yftf_data, self.downloads_dir_path]})
+        self.yftf_files.update({info_hash: [yftf_json, self.downloads_dir_path]})
 
-        worker = client_worker.ClientWorker(1, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
+        worker = client_worker.ClientWorker(1, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from, self.start_port_from + self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
 
         self.workers.update({info_hash: worker})
         worker.start_client()

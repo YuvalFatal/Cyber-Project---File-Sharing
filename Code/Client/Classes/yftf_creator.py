@@ -25,7 +25,7 @@ class YftfCreator(object):
             self.path = path
             self.create_yftf(yftf_path)
         else:
-            print exists[1]
+            print "ERROR: " + exists[1]
 
     def is_exist(self, path, yftf_path):
         """
