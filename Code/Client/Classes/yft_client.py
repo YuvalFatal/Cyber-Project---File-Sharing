@@ -14,6 +14,7 @@ class YFTClient(object):
         self.peer_ip = YFTClient.get_host_ip()
 
         self.yftf_files = dict()
+        self.workers = dict()
 
         self.thread_counter = 0
         self.start_port_from = 6000
@@ -52,7 +53,11 @@ class YFTClient(object):
 
         self.yftf_files.update({info_hash: [yftf_data, self.downloads_dir_path]})
 
-        client_worker.ClientWorker(0, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
+        worker = client_worker.ClientWorker(0, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
+
+        self.workers.update({info_hash: worker})
+        worker.start_client()
+
         self.thread_counter += 1
 
     def new_share(self):
@@ -71,7 +76,11 @@ class YFTClient(object):
 
         self.yftf_files.update({info_hash: [yftf_data, self.downloads_dir_path]})
 
-        client_worker.ClientWorker(1, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
+        worker = client_worker.ClientWorker(1, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
+
+        self.workers.update({info_hash: worker})
+        worker.start_client()
+
         self.thread_counter += 1
 
     def stop_upload(self):
@@ -83,9 +92,14 @@ class YFTClient(object):
                 del self.yftf_files[info_hash]
                 break
 
-        client_worker.ClientWorker(2, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
-        self.thread_counter -= 1
+        if len(info_hash) < 0:
+            print "ERROR: You don't upload this files"
+            return
 
+        self.workers[info_hash].stop_upload()
+        del self.workers[info_hash]
+
+        self.thread_counter -= 1
 
     @staticmethod
     def get_host_ip():
