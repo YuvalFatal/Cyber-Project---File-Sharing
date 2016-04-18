@@ -1,6 +1,11 @@
 import socket
 import random
 import string
+import client_worker
+import os
+import json
+import hashlib
+import yftf_creator
 
 
 class YFTClient(object):
@@ -32,13 +37,55 @@ class YFTClient(object):
                 continue
 
     def new_download(self):
-        pass
+        yftf_path = raw_input("What is the yftf file path? ")
+
+        if not os.path.isfile(yftf_path):
+            print "Your yftf file doesn't exists"
+            return
+
+        yftf_file = open(yftf_path, 'r')
+        yftf_data = yftf_file.read()
+        yftf_json = json.loads(yftf_data)
+        yftf_file.close()
+
+        info_hash = hashlib.sha1(yftf_json["Info"]).hexdigest()
+
+        self.yftf_files.update({info_hash: [yftf_data, self.downloads_dir_path]})
+
+        client_worker.ClientWorker(0, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
+        self.thread_counter += 1
 
     def new_share(self):
-        pass
+        path = raw_input("Where the file/s you want to share is/are?")
+        yftf_path = raw_input("Where do you want to save the yftf file? ")
+        tracker_url = raw_input("What is your tracker server url?")
+
+        yftf_creator.YftfCreator(path, yftf_path, tracker_url)
+
+        yftf_file = open(yftf_path, 'r')
+        yftf_data = yftf_file.read()
+        yftf_json = json.loads(yftf_data)
+        yftf_file.close()
+
+        info_hash = hashlib.sha1(yftf_json["Info"]).hexdigest()
+
+        self.yftf_files.update({info_hash: [yftf_data, self.downloads_dir_path]})
+
+        client_worker.ClientWorker(1, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
+        self.thread_counter += 1
 
     def stop_upload(self):
-        pass
+        shared_file_name = raw_input("What is the name of the shared file/s?")
+        info_hash = ""
+
+        for info_hash, data in self.yftf_files.iteritems():
+            if data[0]["Info"]["Name"] is shared_file_name:
+                del self.yftf_files[info_hash]
+                break
+
+        client_worker.ClientWorker(2, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
+        self.thread_counter -= 1
+
 
     @staticmethod
     def get_host_ip():

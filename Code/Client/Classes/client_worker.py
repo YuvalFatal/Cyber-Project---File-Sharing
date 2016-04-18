@@ -9,7 +9,7 @@ import clients_protocol
 
 
 class ClientWorker(object):
-    def __init__(self, command, yftf_files, info_hash, peer_id, peer_ip, num_workers, queue_size, port_range):
+    def __init__(self, command, yftf_files, info_hash, peer_id, peer_ip, port_range, num_workers, queue_size):
         self.peer_id = peer_id
         self.peer_ip = peer_ip
         self.port_range_in_use = dict(zip(port_range, [False] * 10))
