@@ -6,10 +6,13 @@ import os
 import json
 import hashlib
 import yftf_creator
+from Tkinter import *
+import tkFileDialog
 
 
-class YFTClient(object):
-    def __init__(self):
+class YFTClient(Frame):
+    def __init__(self, master=None):
+        Frame.__init__(self, master)
         self.peer_id = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(20))
         self.peer_ip = YFTClient.get_host_ip()
 
@@ -20,22 +23,78 @@ class YFTClient(object):
         self.start_port_from = 6000
         self.num_port_per_thread = 10
 
-        self.downloads_dir_path = raw_input("Where do you want your downloads to be saved?")
+        self.downloads_dir_path = None
+        self.yftf_dir_path = None
 
-        while True:
-            command = raw_input("What do you want to do next?")
+        self.start_page()
 
-            if command == str(0):
-                self.new_download()
-                continue
+        # while True:
+        #     command = raw_input("What do you want to do next?")
+        #
+        #     if command == str(0):
+        #         self.new_download()
+        #         continue
+        #
+        #     if command == str(1):
+        #         self.new_share()
+        #         continue
+        #
+        #     if command == str(2):
+        #         self.stop_upload()
+        #         continue
 
-            if command == str(1):
-                self.new_share()
-                continue
+    def start_page(self):
+        change_downloads = Button(self)
+        change_downloads["text"] = "Change Downloads Dir"
+        change_downloads["command"] = self.choose_downloads_path
 
-            if command == str(2):
-                self.stop_upload()
-                continue
+        self.download_path = Entry(self, textvariable=self.downloads_dir_path, width=80)
+        self.download_path.config(state=DISABLED)
+
+        change_yftf = Button(self)
+        change_yftf["text"] = "Change yftf Dir"
+        change_yftf["command"] = self.choose_yftf_path
+
+        self.yftf_path = Entry(self, textvariable=self.downloads_dir_path, width=80)
+        self.yftf_path.config(state=DISABLED)
+
+        change_downloads.grid(row=0, column=0, padx=10, pady=10)
+
+        self.download_path.grid(row=0, column=1, padx=10, pady=10)
+
+        change_yftf.grid(row=1, column=0, padx=10, pady=10)
+
+        self.yftf_path.grid(row=1, column=1, padx=10, pady=10)
+
+        new_download_button = Button(self)
+        new_download_button["text"] = "New Download"
+        new_download_button["command"] = self.new_download
+
+        new_share_button = Button(self)
+        new_share_button["text"] = "New Share"
+        new_share_button["command"] = self.new_share
+
+        stop_update_button = Button(self)
+        stop_update_button["text"] = "Stop Update/Download"
+        stop_update_button["command"] = self.stop_upload
+
+        new_download_button.grid(row=2, column=0, padx=10, pady=10)
+        new_share_button.grid(row=2, column=1, padx=10, pady=10)
+        stop_update_button.grid(row=3, column=0, padx=10, pady=10)
+
+    def choose_downloads_path(self):
+        self.downloads_dir_path = tkFileDialog.askdirectory(parent=self, initialdir="/", title='Please select the directory you want your downloads to be saved')
+        self.download_path.config(state=NORMAL)
+        self.download_path.delete(0, END)
+        self.download_path.insert(0, self.downloads_dir_path)
+        self.download_path.config(state=DISABLED)
+
+    def choose_yftf_path(self):
+        self.yftf_dir_path = tkFileDialog.askdirectory(parent=self, initialdir="/", title='Please select the directory you want your yftf files to be saved')
+        self.yftf_path.config(state=NORMAL)
+        self.yftf_path.delete(0, END)
+        self.yftf_path.insert(0, self.yftf_dir_path)
+        self.yftf_path.config(state=DISABLED)
 
     def new_download(self):
         yftf_path = raw_input("What is the yftf file path? ")
@@ -62,12 +121,11 @@ class YFTClient(object):
 
     def new_share(self):
         path = raw_input("Where the file/s you want to share is/are?")
-        yftf_path = raw_input("Where do you want to save the yftf file? ")
         tracker_url = raw_input("What is your tracker server url?")
 
-        yftf_creator.YftfCreator(path, yftf_path, tracker_url)
+        yftf_creator.YftfCreator(path, self.yftf_dir_path, tracker_url)
 
-        yftf_file = open(os.path.join(yftf_path, path.split('\\')[-1].split('.')[0] + ".yftf"), 'r')
+        yftf_file = open(os.path.join(self.yftf_dir_path, path.split('\\')[-1].split('.')[0] + ".yftf"), 'r')
         yftf_data = yftf_file.read()
         yftf_json = json.loads(yftf_data)
         yftf_file.close()
@@ -112,7 +170,9 @@ class YFTClient(object):
 
 
 def main():
-    YFTClient()
+    root = Tk()
+    app = YFTClient(root)
+    app.mainloop()
 
 
 if __name__ == "__main__":
