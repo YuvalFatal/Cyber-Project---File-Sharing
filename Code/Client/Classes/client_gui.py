@@ -106,7 +106,7 @@ class NewDownloadPage(Frame):
 
         download_button = Button(self)
         download_button["text"] = "Download"
-        download_button["command"] = self.yft_client_obj.new_download
+        download_button["command"] = self.download
 
         home_button.grid(row=0, column=0, padx=10, pady=10)
         change_yftf.grid(row=1, column=0, padx=10, pady=10)
@@ -119,6 +119,10 @@ class NewDownloadPage(Frame):
         self.yftf_path.delete(0, END)
         self.yftf_path.insert(0, self.yft_client_obj.yftf_path)
         self.yftf_path.config(state=DISABLED)
+
+    def download(self):
+        self.yft_client_obj.command = 0
+        self.yft_client_obj.new_action()
 
 
 class NewSharePage(Frame):
@@ -143,7 +147,7 @@ class NewSharePage(Frame):
 
         share_button = Button(self)
         share_button["text"] = "Share"
-        share_button["command"] = self.get_data_and_share
+        share_button["command"] = self.share
 
         home_button.grid(row=0, column=0, padx=10, pady=10)
         change_shared_files_dir_path.grid(row=1, column=0, padx=10, pady=10)
@@ -159,9 +163,10 @@ class NewSharePage(Frame):
         self.shared_files_dir_path.insert(0, self.yft_client_obj.shared_files_dir_path)
         self.shared_files_dir_path.config(state=DISABLED)
 
-    def get_data_and_share(self):
+    def share(self):
+        self.yft_client_obj.command = 1
         self.yft_client_obj.tracker_url = self.tracker_url["text"]
-        self.yft_client_obj.new_share()
+        self.yft_client_obj.new_action()
 
 
 class StopUploadPage(Frame):
@@ -181,7 +186,7 @@ class StopUploadPage(Frame):
 
         stop_button = Button(self)
         stop_button["text"] = "Stop"
-        stop_button["command"] = self.yft_client_obj.stop_upload
+        stop_button["command"] = self.stop
 
         home_button.grid(row=0, column=0, padx=10, pady=10)
         change_yftf.grid(row=1, column=0, padx=10, pady=10)
@@ -194,6 +199,10 @@ class StopUploadPage(Frame):
         self.yftf_path.delete(0, END)
         self.yftf_path.insert(0, self.yft_client_obj.yftf_path)
         self.yftf_path.config(state=DISABLED)
+
+    def stop(self):
+        self.yft_client_obj.command = 2
+        self.yft_client_obj.new_action()
 
 
 def main():

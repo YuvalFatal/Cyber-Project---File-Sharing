@@ -6,6 +6,7 @@ import os
 import json
 import hashlib
 import yftf_creator
+import thread
 
 
 class YFTClient(object):
@@ -25,6 +26,20 @@ class YFTClient(object):
         self.yftf_path = ""
         self.shared_files_dir_path = ""
         self.tracker_url = ""
+        self.command = 0
+
+    def new_action(self):
+        if self.command is 0:
+            thread.start_new_thread(self.new_download, ())
+            return
+
+        if self.command is 1:
+            thread.start_new_thread(self.new_share, ())
+            return
+
+        if self.command is 2:
+            thread.start_new_thread(self.stop_upload, ())
+            return
 
     def correct_path(self):
         self.downloads_dir_path = self.downloads_dir_path.replace('/', '\\')
@@ -36,7 +51,7 @@ class YFTClient(object):
         self.correct_path()
 
         if not os.path.isfile(self.yftf_path):
-            print "Your yftf file doesn't exists"
+            print "Error: Your yftf file doesn't exists"
             return
 
         yftf_file = open(self.yftf_path, 'r')
