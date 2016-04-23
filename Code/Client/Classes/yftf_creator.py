@@ -76,9 +76,9 @@ class YftfCreator(object):
         yftf_data = self.get_data()
 
         if self.is_file:
-            yftf = open(path + '\\' + ''.join(yftf_data['Info']['Name'].split('.')[:-1]) + '.yftf', 'w')
+            yftf = open(os.path.join(path, ''.join(yftf_data['Info']['Name'].split('.')[:-1]) + '.yftf'), 'w')
         else:
-            yftf = open(path + '\\' + yftf_data['Info']['Name'] + '.yftf', 'w')
+            yftf = open(os.path.join(path, yftf_data['Info']['Name'] + '.yftf'), 'w')
 
         yftf.write(json.dumps(yftf_data))
 
