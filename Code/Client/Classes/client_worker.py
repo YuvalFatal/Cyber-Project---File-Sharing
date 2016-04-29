@@ -36,11 +36,6 @@ class ClientWorker(object):
     def stop_upload(self):
         self.command = 2
 
-    def set_num_workers(self, num_workers):
-        self.num_workers = num_workers
-
-        self.http_client.configure(None, max_clients=self.num_workers)
-
     def handle_response(self, response):
         if response.error:
             print "Error:", response.error
@@ -51,8 +46,6 @@ class ClientWorker(object):
                 print data[1]
 
             elif data[0] is 1:
-                self.set_num_workers(self.num_workers)
-
                 port = int(data[1])
                 self.upload(port)
 
@@ -119,6 +112,7 @@ class ClientWorker(object):
 
             try:
                 yield self.http_client.fetch(req, self.handle_response)
+
             finally:
                 self.queue.task_done()
 
@@ -151,6 +145,9 @@ class ClientWorker(object):
     def request(self):
         if self.num_requests is 0 and self.command is 0:
             req = self.basic_request(client_server_protocol.ClientServerProtocol.start_new_download_request(self.info_hash, self.peer_id, self.peer_ip, 0))
+
+            if self.info_hash not in self.pieces_requested_index:
+                self.pieces_requested_index.update({self.info_hash: []})
 
             self.pieces_requested_index[self.info_hash] += [self.num_requests]
             self.num_requests += 1

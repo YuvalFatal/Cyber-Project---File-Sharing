@@ -59,11 +59,11 @@ class YFTClient(object):
         yftf_json = json.loads(yftf_data)
         yftf_file.close()
 
-        info_hash = hashlib.sha1(yftf_json["Info"]).hexdigest()
+        info_hash = hashlib.sha1(json.dumps(yftf_json["Info"])).hexdigest()
 
         self.yftf_files.update({info_hash: [yftf_json, self.downloads_dir_path]})
 
-        worker = client_worker.ClientWorker(0, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
+        worker = client_worker.ClientWorker(0, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), 1, self.num_port_per_thread * 10)
 
         self.workers.update({info_hash: worker})
         self.thread_counter += 1
@@ -107,8 +107,10 @@ class YFTClient(object):
             return
 
         print self.workers
-        self.workers[info_hash].stop_upload()
         del self.workers[info_hash]
+
+        worker = client_worker.ClientWorker(2, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from, self.start_port_from + self.num_port_per_thread), 1, self.num_port_per_thread * 10)
+        del worker
 
         self.thread_counter -= 1
 

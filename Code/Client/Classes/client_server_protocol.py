@@ -53,24 +53,24 @@ class ClientServerProtocol(object):
 
     @staticmethod
     def handle_response(yftf_files, pieces_requested_index, response_headers):
-        if "YFT-Info-Hash" not in response_headers.keys() or response_headers["YFT-Info-Hash"] not in yftf_files.keys():
+        if "Yft-Info-Hash" not in response_headers.keys() or response_headers["Yft-Info-Hash"] not in yftf_files.keys():
             return 0, "ERROR: Response not valid"
 
-        yftf_json = yftf_files[response_headers["YFT-Info-Hash"]][0]
+        yftf_json = yftf_files[response_headers["Yft-Info-Hash"]][0]
 
-        if "YFT-Error" in response_headers.keys():
-            return 0, yftf_json["Info"]["Name"] + " - ERROR:" + response_headers["YFT-Error"]
+        if "Yft-Error" in response_headers.keys():
+            return 0, yftf_json["Info"]["Name"] + " - ERROR:" + response_headers["Yft-Error"]
 
-        if "YFT-Type" not in response_headers.keys():
+        if "Yft-Type" not in response_headers.keys():
             return 0, yftf_json["Info"]["Name"] + " - ERROR: Header is missing"
 
-        if response_headers["YFT-Type"] is str(1):
-            return 1, response_headers["YFT-Port"]
+        if response_headers["Yft-Type"] is str(1):
+            return 1, response_headers["Yft-Port"]
 
-        if response_headers["YFT-Info-Hash"] not in pieces_requested_index.keys():
+        if response_headers["Yft-Info-Hash"] not in pieces_requested_index.keys():
             return 0, yftf_json["Info"]["Name"] + " - ERROR: You didn't requested from this file"
 
-        if int(response_headers["YFT-Piece-Index"]) not in pieces_requested_index[response_headers["YFT-Info-Hash"]]:
+        if int(response_headers["Yft-Piece-Index"]) not in pieces_requested_index[response_headers["Yft-Info-Hash"]]:
             return 0, yftf_json["Info"]["Name"] + " - ERROR: You didn't requested this piece"
 
-        return 2, int(response_headers["YFT-Piece-Index"]), response_headers["YFT-ip"], int(response_headers["YFT-Port"])
+        return 2, int(response_headers["Yft-Piece-Index"]), response_headers["Yft-Ip"], int(response_headers["Yft-Port"])
