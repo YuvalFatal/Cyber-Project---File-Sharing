@@ -13,10 +13,10 @@ class YFTServer(object):
         self.http_server.listen(listen_port)
 
     def handle_request(self, request):
-        print request
         headers = self.protocol.handle_request(request.headers, request.body)
 
         response = self.write_response(headers)
+        print response
 
         request.write(response)
         request.finish()

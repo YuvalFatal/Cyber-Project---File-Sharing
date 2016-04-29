@@ -84,7 +84,7 @@ class YFTClient(object):
 
         self.yftf_files.update({info_hash: [yftf_json, self.downloads_dir_path]})
 
-        worker = client_worker.ClientWorker(1, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from, self.start_port_from + self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
+        worker = client_worker.ClientWorker(1, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from, self.start_port_from + self.num_port_per_thread), 1, self.num_port_per_thread * 10)
 
         self.workers.update({info_hash: worker})
         self.thread_counter += 1

@@ -6,6 +6,8 @@ import client_server_protocol
 from random import randint
 import socket
 import clients_protocol
+import hashlib
+import json
 
 
 class ClientWorker(object):
@@ -34,6 +36,11 @@ class ClientWorker(object):
     def stop_upload(self):
         self.command = 2
 
+    def set_num_workers(self, num_workers):
+        self.num_workers = num_workers
+
+        self.http_client.configure(None, max_clients=self.num_workers)
+
     def handle_response(self, response):
         if response.error:
             print "Error:", response.error
@@ -44,6 +51,8 @@ class ClientWorker(object):
                 print data[1]
 
             elif data[0] is 1:
+                self.set_num_workers(self.num_workers)
+
                 port = int(data[1])
                 self.upload(port)
 
@@ -156,7 +165,10 @@ class ClientWorker(object):
 
             self.first_uploader += 1
 
-            return self.basic_request(client_server_protocol.ClientServerProtocol.new_share_request(self.info_hash, self.peer_id, self.peer_ip, port))
+            req = self.basic_request(client_server_protocol.ClientServerProtocol.new_share_request(hashlib.sha1(json.dumps(self.yftf_files[self.info_hash][0])).hexdigest(), self.peer_id, self.peer_ip, port))
+            req.body = json.dumps(self.yftf_files[self.info_hash][0])
+
+            return req
 
         elif self.command is 2:
             return self.basic_request(client_server_protocol.ClientServerProtocol.finish_sharing_request(self.info_hash, self.peer_id, self.peer_ip))

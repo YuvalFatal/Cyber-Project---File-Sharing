@@ -27,81 +27,81 @@ class ClientServerProtocol(object):
         if not request_headers:
             return {"YFT-Error": "You probably miss some headers"}
 
-        if ["YFT-Peer-id", "YFT-Peer-Status", "YFT-Upload-Piece", "YFT-yftf-Hash", "YFT-Port"] in request_headers.keys():
+        if {"Yft-Peer-Id", "Yft-Peer-Status", "Yft-Upload-Piece", "Yft-Yftf-Hash", "Yft-Port", "Yft-Peer-Ip"}.issubset(set(request_headers.keys())):
             return self.handle_new_share(request_headers, request_body)
 
-        if ["YFT-Info-Hash", "YFT-Peer-id", "YFT-Peer-ip", "YFT-Peer-Status", "YFT-Port"] in request_headers.keys():
-            if request_headers["YFT-Info-Hash"] not in self.yftf_files:
+        if {"Yft-Info-Hash", "Yft-Peer-Id", "Yft-Peer-Ip", "Yft-Peer-Status", "Yft-Port"}.issubset(set(request_headers.keys())):
+            if request_headers["Yft-Info-Hash"] not in self.yftf_files:
                 return {"YFT-Error": "This file is not shared"}
 
-            if request_headers["YFT-Peer-Status"] is str(2):
+            if request_headers["Yft-Peer-Status"] is str(2):
                 self.remove_peer(request_headers)
                 return
 
-            if request_headers["YFT-Peer-Status"] is str(0):
+            if request_headers["Yft-Peer-Status"] is str(0):
                 self.add_peer(request_headers)
 
-            if "YFT-Finished-Piece-Index" in request_headers.keys():
+            if "Yft-Finished-Piece-Index" in request_headers.keys():
                 self.handle_finished_piece(request_headers)
 
-            if "YFT-Request-Piece-Index" in request_headers.keys():
+            if "Yft-Request-Piece-Index" in request_headers.keys():
                 return self.handle_downloader_request(request_headers)
 
-            if ["YFT-Port", "YFT-Upload-Piece"] in request_headers.keys() and request_headers["YFT-Upload-Piece"] is str(1):
+            if {"Yft-Port", "Yft-Upload-Piece"}.issubset(set(request_headers.keys())) and request_headers["Yft-Upload-Piece"] is str(1):
                 return self.handle_uploader_request(request_headers)
 
         return {"YFT-Error": "You probably miss some headers"}
 
     def remove_peer(self, request_headers):
-        self.yftf_files[request_headers["YFT-Info-Hash"]].remove_peer(request_headers["YFT-Peer-id"])
+        self.yftf_files[request_headers["Yft-Info-Hash"]].remove_peer(request_headers["Yft-Peer-Id"])
 
     def add_peer(self, request_headers):
-        self.yftf_files[request_headers["YFT-Info-Hash"]].add_peer(request_headers["YFT-Peer-id"], request_headers["YFT-Peer-ip"])
+        self.yftf_files[request_headers["Yft-Info-Hash"]].add_peer(request_headers["Yft-Peer-Id"], request_headers["Yft-Peer-Ip"])
 
     def handle_finished_piece(self, request_headers):
-        self.yftf_files[request_headers["YFT-Info-Hash"]].add_piece(map(int, request_headers["YFT-Finished-Piece-Index"].split(', ')))
+        self.yftf_files[request_headers["Yft-Info-Hash"]].add_piece(map(int, request_headers["Yft-Finished-Piece-Index"].split(', ')))
 
     def handle_downloader_request(self, request_headers):
-        table = self.yftf_files[request_headers["YFT-Info-Hash"]]
+        table = self.yftf_files[request_headers["Yft-Info-Hash"]]
 
-        uploader_data = table.find_uploader(int(request_headers["YFT-Request-Piece-Index"]))
+        uploader_data = table.find_uploader(int(request_headers["Yft-Request-Piece-Index"]))
 
         if not uploader_data:
             return {"YFT-Info-Hash": table.get_info_hash(), "YFT-Error": "Could not find an uploader"}
 
-        return {"YFT-Info-Hash": table.get_info_hash(), "YFT-Type": str(0), "YFT-ip": uploader_data[0], "YFT-Piece-Index": request_headers["YFT-Request-Piece-Index"], "YFT-Port": str(uploader_data[1])}
+        return {"YFT-Info-Hash": table.get_info_hash(), "YFT-Type": str(0), "YFT-ip": uploader_data[0], "YFT-Piece-Index": request_headers["Yft-Request-Piece-Index"], "YFT-Port": str(uploader_data[1])}
 
     def handle_uploader_request(self, request_headers):
-        table = self.yftf_files[request_headers["YFT-Info-Hash"]]
+        table = self.yftf_files[request_headers["Yft-Info-Hash"]]
 
-        table.set_peer_waiting(request_headers["YFT-Peer-id"], int(request_headers["YFT-Port"]))
+        table.set_peer_waiting(request_headers["Yft-Peer-Id"], int(request_headers["Yft-Port"]))
 
-        return {"YFT-Info-Hash": table.get_info_hash(), "YFT-Type": str(1), "YFT-Port": str(request_headers["YFT-Port"])}
+        return {"YFT-Info-Hash": table.get_info_hash(), "YFT-Type": str(1), "YFT-Port": str(request_headers["Yft-Port"])}
 
     def handle_new_share(self, request_headers, request_body):
         if not request_body:
             return {"YFT-Error": "There is no yftf file in body"}
 
-        if hashlib.sha1(request_body).hexdigest() is not request_headers["YFT-yftf-Hash"]:
-            return {"YFT-Error": "yftf file corrupted"}
+        if hashlib.sha1(request_body).hexdigest() != request_headers["Yft-Yftf-Hash"]:
+            return {"Yft-Error": "yftf file corrupted"}
 
         yftf_json = json.loads(request_body)
-        info_hash = hashlib.sha1(yftf_json["Info"]).hexdigest()
+        info_hash = hashlib.sha1(json.dumps(yftf_json["Info"])).hexdigest()
 
         if info_hash not in self.yftf_files.keys():
             table = shared_file_table.SharedFileTable(info_hash, self.saved_tables_path, request_body)
         else:
             return {"YFT-Info-Hash": info_hash, "YFT-Error": "File is already shared"}
 
-        peer_id = request_headers["YFT-Peer-id"]
+        peer_id = request_headers["Yft-Peer-Id"]
 
-        if request_headers["YFT-Peer-Status"] is str(0):
-            table.add_peer(peer_id, request_headers["YFT-Peer-ip"])
+        if request_headers["Yft-Peer-Status"] is str(0):
+            table.add_peer(peer_id, request_headers["Yft-Peer-Ip"])
         else:
             return {"YFT-Info-Hash": info_hash, "YFT-Error": "Your status must be 0"}
 
-        if request_headers["YFT-Upload-Piece"] is str(1):
-            table.set_peer_waiting(peer_id, str(request_headers["YFT-Port"]))
+        if request_headers["Yft-Upload-Piece"] is str(1):
+            table.set_peer_waiting(peer_id, str(request_headers["Yft-Port"]))
         else:
             return {"YFT-Info-Hash": info_hash, "YFT-Error": "Your must share"}
 
@@ -109,7 +109,7 @@ class ClientServerProtocol(object):
 
         self.yftf_files.update({info_hash: table})
 
-        return {"YFT-Info-Hash": info_hash, "YFT-Type": str(1), "YFT-Port": str(request_headers["YFT-Port"])}
+        return {"YFT-Info-Hash": info_hash, "YFT-Type": str(1), "YFT-Port": str(request_headers["Yft-Port"])}
 
     def __del__(self):
         data_save_file = open("data_save.obj", 'wb')
