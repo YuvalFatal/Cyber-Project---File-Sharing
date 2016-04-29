@@ -165,7 +165,7 @@ class NewSharePage(Frame):
 
     def share(self):
         self.yft_client_obj.command = 1
-        self.yft_client_obj.tracker_url = self.tracker_url["text"]
+        self.yft_client_obj.tracker_url = self.tracker_url.get()
         self.yft_client_obj.new_action()
 
 

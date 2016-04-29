@@ -96,7 +96,7 @@ class ClientWorker(object):
 
         data = clients_protocol.ClientProtocol.handle_request(ClientWorker.receive(client_socket), self.yftf_files)
 
-        ClientWorker.send(clients_protocol, data)
+        ClientWorker.send(client_socket, data)
 
         self.port_range_in_use[port] = False
 
@@ -156,7 +156,7 @@ class ClientWorker(object):
 
             self.first_uploader += 1
 
-            return self.basic_request(client_server_protocol.ClientServerProtocol.new_share_request(self.yftf_files[self.info_hash][0], self.peer_id, self.peer_ip, port))
+            return self.basic_request(client_server_protocol.ClientServerProtocol.new_share_request(self.info_hash, self.peer_id, self.peer_ip, port))
 
         elif self.command is 2:
             return self.basic_request(client_server_protocol.ClientServerProtocol.finish_sharing_request(self.info_hash, self.peer_id, self.peer_ip))
