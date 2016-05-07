@@ -107,9 +107,11 @@ class YFTClient(object):
             return
 
         print self.workers
+        self.workers[info_hash].stop_upload()
         del self.workers[info_hash]
 
         worker = client_worker.ClientWorker(2, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from, self.start_port_from + self.num_port_per_thread), 1, self.num_port_per_thread * 10)
+        worker.stop_upload()
         del worker
 
         self.thread_counter -= 1

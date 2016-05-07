@@ -34,7 +34,7 @@ class ClientWorker(object):
         self.http_client = AsyncHTTPClient()
 
     def stop_upload(self):
-        self.command = 2
+        IOLoop.current().close()
 
     def handle_response(self, response):
         if response.error:
