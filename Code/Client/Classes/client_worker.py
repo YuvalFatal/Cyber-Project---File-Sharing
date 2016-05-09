@@ -40,13 +40,15 @@ class ClientWorker(object):
             elif data[0] is 1:
                 print data
                 port = int(data[1])
-                thread.start_new_thread(self.upload, (response.headers["Yft-Info-Hash"], port))
+                # thread.start_new_thread(self.upload, (response.headers["Yft-Info-Hash"], port))
+                self.upload(response.headers["Yft-Info-Hash"], port)
 
             else:
                 piece_index = data[1]
                 uploader_ip = data[2]
                 uploader_port = data[3]
-                thread.start_new_thread(self.download, (response.headers["Yft-Info-Hash"], piece_index, uploader_ip, uploader_port))
+                # thread.start_new_thread(self.download, (response.headers["Yft-Info-Hash"], piece_index, uploader_ip, uploader_port))
+                self.download(response.headers["Yft-Info-Hash"], piece_index, uploader_ip, uploader_port)
 
     @staticmethod
     def send(sock, data):
@@ -59,7 +61,6 @@ class ClientWorker(object):
     def receive(sock):
         length = int(sock.recv(8))
         data = ""
-
         while length != 0:
             data += sock.recv(1)
             length -= 1
@@ -69,6 +70,7 @@ class ClientWorker(object):
     @gen.coroutine
     def download(self, info_hash, piece_index, uploader_ip, uploader_port):
         sock = socket.socket()
+        sock.settimeout(30)
         sock.connect((uploader_ip, uploader_port))
 
         ClientWorker.send(sock, clients_protocol.ClientProtocol.request(info_hash, piece_index))
@@ -92,7 +94,7 @@ class ClientWorker(object):
         (client_socket, client_address) = server_socket.accept()
 
         data = clients_protocol.ClientProtocol.handle_request(ClientWorker.receive(client_socket), self.yftf_files)
-
+        print 'hadf'
         ClientWorker.send(client_socket, data)
 
         self.actions[info_hash].port_range_in_use[port] = False
@@ -117,7 +119,6 @@ class ClientWorker(object):
             IOLoop.current().spawn_callback(self.worker)
 
         while True:
-            print 'hi'
             if not self.actions:
                 continue
 

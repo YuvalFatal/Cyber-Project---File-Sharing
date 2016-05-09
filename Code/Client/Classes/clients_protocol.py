@@ -17,20 +17,21 @@ class ClientProtocol(object):
         file_path = str()
         file_piece_index = int()
 
-        pieces_counter = -1
+        pieces_counter = 0
         for shared_file_info in yftf_data["Info"]["Files"]:
             pieces_counter += len(shared_file_info["Pieces Hash"])
 
             if pieces_counter >= piece_index:
-                file_piece_index = piece_index - pieces_counter - len(shared_file_info["Pieces Hash"])
+                file_piece_index = piece_index - (pieces_counter - len(shared_file_info["Pieces Hash"]))
                 file_path = shared_file_info["Path"]
                 break
 
-        if not file_path or not os.path.exists(file_path):
+        if not file_path or not os.path.exists(shared_files_dir_path + file_path):
             return None
 
-        shared_file = open(os.path.join(shared_files_dir_path, file_path), 'rb')
-        shared_file.seek(file_piece_index * yftf_data["Info"]["Piece Length"])
+        print file_piece_index
+        shared_file = open(shared_files_dir_path + file_path, 'rb')
+        shared_file.read(file_piece_index * yftf_data["Info"]["Piece Length"])
         data = shared_file.read(yftf_data["Info"]["Piece Length"])
         shared_file.close()
 
@@ -43,8 +44,11 @@ class ClientProtocol(object):
     @staticmethod
     def handle_response(response, requests, yftf_files):
         info_hash = response[0:40]
-
+        print 'hi1'
+        print info_hash
+        print yftf_files
         if info_hash not in yftf_files.keys() or info_hash in requests.keys():
+            print 'hi2'
             return None
 
         yftf_data = yftf_files[info_hash][0]
@@ -65,8 +69,9 @@ class ClientProtocol(object):
                 pieces_counter += len(shared_file_info["Pieces Hash"])
 
                 if pieces_counter >= piece_index:
-                    file_piece_index = piece_index - pieces_counter - len(shared_file_info["Pieces Hash"])
-
+                    file_piece_index = piece_index - (pieces_counter - len(shared_file_info["Pieces Hash"]))
+                    print data_hash
+                    print shared_file_info["Pieces Hash"][file_piece_index]
                     if shared_file_info["Pieces Hash"][file_piece_index] is data_hash:
                         file_path = shared_file_info["Path"]
                         break
@@ -75,6 +80,7 @@ class ClientProtocol(object):
                 break
 
         if not file_path:
+            print 'hi3'
             return None
 
         shared_file = open(os.path.join(shared_files_dir_path, file_path), 'wb')

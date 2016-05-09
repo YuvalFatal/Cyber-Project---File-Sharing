@@ -30,7 +30,7 @@ class ClientServerProtocol(object):
         if {"Yft-Peer-Id", "Yft-Peer-Status", "Yft-Upload-Piece", "Yft-Yftf-Hash", "Yft-Port", "Yft-Peer-Ip"}.issubset(set(request_headers.keys())):
             return self.handle_new_share(request_headers, request_body)
 
-        if {"Yft-Info-Hash", "Yft-Peer-Id", "Yft-Peer-Ip", "Yft-Peer-Status", "Yft-Port"}.issubset(set(request_headers.keys())):
+        if {"Yft-Info-Hash", "Yft-Peer-Id", "Yft-Peer-Ip", "Yft-Peer-Status"}.issubset(set(request_headers.keys())):
             if request_headers["Yft-Info-Hash"] not in self.yftf_files:
                 return {"YFT-Error": "This file is not shared"}
 
