@@ -27,7 +27,7 @@ class YFTClient(object):
         self.tracker_url = ""
         self.command = -1
 
-        self.worker_object = client_worker.ClientWorker(self.yftf_files, 1, 1)
+        self.worker_object = client_worker.ClientWorker(self.yftf_files, 100, 1000)
 
         thread.start_new_thread(self.worker_object.start_client, ())
 

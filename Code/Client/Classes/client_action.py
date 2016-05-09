@@ -134,5 +134,7 @@ class ClientAction(object):
 
                     return req
 
-    def handle_response(self, response_headers):
+    def handle_response(self, yftf_files, response_headers):
+        self.yftf_files = yftf_files
+
         return client_server_protocol.ClientServerProtocol.handle_response(self.yftf_files, self.pieces_requested_index, response_headers)
