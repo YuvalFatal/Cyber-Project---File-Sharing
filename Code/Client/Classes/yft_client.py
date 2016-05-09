@@ -15,7 +15,6 @@ class YFTClient(object):
         self.peer_ip = YFTClient.get_host_ip()
 
         self.yftf_files = dict()
-        self.workers = dict()
 
         self.thread_counter = 0
         self.start_port_from = 6000
@@ -26,19 +25,26 @@ class YFTClient(object):
         self.yftf_path = ""
         self.shared_files_dir_path = ""
         self.tracker_url = ""
-        self.command = 0
+        self.command = -1
+
+        self.worker_object = client_worker.ClientWorker(self.yftf_files, 1, 1)
+
+        thread.start_new_thread(self.worker_object.start_client, ())
 
     def new_action(self):
+        if self.command is -1:
+            return
+
         if self.command is 0:
-            thread.start_new_thread(self.new_download, ())
+            self.new_download()
             return
 
         if self.command is 1:
-            thread.start_new_thread(self.new_share, ())
+            self.new_share()
             return
 
         if self.command is 2:
-            thread.start_new_thread(self.stop_upload, ())
+            self.stop_upload()
             return
 
     def correct_path(self):
@@ -63,12 +69,9 @@ class YFTClient(object):
 
         self.yftf_files.update({info_hash: [yftf_json, self.downloads_dir_path]})
 
-        worker = client_worker.ClientWorker(0, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), 1, self.num_port_per_thread * 10)
+        self.worker_object.add_action(0, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + self.num_port_per_thread * self.thread_counter, self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
 
-        self.workers.update({info_hash: worker})
         self.thread_counter += 1
-
-        worker.start_client()
 
     def new_share(self):
         self.correct_path()
@@ -84,12 +87,9 @@ class YFTClient(object):
 
         self.yftf_files.update({info_hash: [yftf_json, self.downloads_dir_path]})
 
-        worker = client_worker.ClientWorker(1, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from, self.start_port_from + self.num_port_per_thread), 1, self.num_port_per_thread * 10)
+        self.worker_object.add_action(1, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from, self.start_port_from + self.num_port_per_thread), self.num_port_per_thread, self.num_port_per_thread * 10)
 
-        self.workers.update({info_hash: worker})
         self.thread_counter += 1
-
-        worker.start_client()
 
     def stop_upload(self):
         self.correct_path()
@@ -106,13 +106,9 @@ class YFTClient(object):
             print "ERROR: You don't upload this files"
             return
 
-        print self.workers
-        self.workers[info_hash].stop_upload()
-        del self.workers[info_hash]
+        self.worker_object.add_action(2, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from, self.start_port_from + self.num_port_per_thread), 1, self.num_port_per_thread * 10)
 
-        worker = client_worker.ClientWorker(2, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from, self.start_port_from + self.num_port_per_thread), 1, self.num_port_per_thread * 10)
-        worker.stop_upload()
-        del worker
+        self.worker_object.stop_action(info_hash)
 
         self.thread_counter -= 1
 
