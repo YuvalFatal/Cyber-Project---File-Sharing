@@ -25,7 +25,6 @@ class ClientWorker(object):
             print "Error:", response.error
         else:
             if "Yft-Info-Hash" in response.headers.keys():
-                print response.headers.keys()
                 data = list(self.actions[response.headers["Yft-Info-Hash"]].handle_response(self.yftf_files, response.headers))
             elif "Yft-Error" in response.headers.keys():
                 print response.headers["Yft-Error"]
@@ -38,7 +37,6 @@ class ClientWorker(object):
                 print data[1]
 
             elif data[0] is 1:
-                print data
                 port = int(data[1])
                 # thread.start_new_thread(self.upload, (response.headers["Yft-Info-Hash"], port))
                 self.upload(response.headers["Yft-Info-Hash"], port)
@@ -94,7 +92,7 @@ class ClientWorker(object):
         (client_socket, client_address) = server_socket.accept()
 
         data = clients_protocol.ClientProtocol.handle_request(ClientWorker.receive(client_socket), self.yftf_files)
-        print 'hadf'
+
         ClientWorker.send(client_socket, data)
 
         self.actions[info_hash].port_range_in_use[port] = False

@@ -29,7 +29,6 @@ class ClientProtocol(object):
         if not file_path or not os.path.exists(shared_files_dir_path + file_path):
             return None
 
-        print file_piece_index
         shared_file = open(shared_files_dir_path + file_path, 'rb')
         shared_file.read(file_piece_index * yftf_data["Info"]["Piece Length"])
         data = shared_file.read(yftf_data["Info"]["Piece Length"])
