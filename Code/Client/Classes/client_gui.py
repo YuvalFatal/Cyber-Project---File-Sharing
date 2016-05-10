@@ -32,7 +32,7 @@ class ClientGUI(Tk):
 
 class StartPage(Frame):
     def __init__(self, parent, controller, yft_client_obj):
-        Frame.__init__(self,parent)
+        Frame.__init__(self, parent)
 
         self.yft_client_obj = yft_client_obj
 
@@ -75,14 +75,20 @@ class StartPage(Frame):
         stop_update_button.grid(row=3, column=0, padx=10, pady=10)
 
     def choose_downloads_path(self):
-        self.yft_client_obj.downloads_dir_path = tkFileDialog.askdirectory(parent=self, initialdir="/", title='Please select the directory you want your downloads to be saved')
+        self.yft_client_obj.downloads_dir_path = tkFileDialog.askdirectory(
+            parent=self, initialdir="/",
+            title='Please select the directory you want your downloads to be saved')
+
         self.download_path.config(state=NORMAL)
         self.download_path.delete(0, END)
         self.download_path.insert(0, self.yft_client_obj.downloads_dir_path)
         self.download_path.config(state=DISABLED)
 
     def choose_yftf_path(self):
-        self.yft_client_obj.yftf_dir_path = tkFileDialog.askdirectory(parent=self, initialdir="/", title='Please select the directory you want your yftf files to be saved')
+        self.yft_client_obj.yftf_dir_path = tkFileDialog.askdirectory(
+            parent=self, initialdir="/",
+            title='Please select the directory you want your yftf files to be saved')
+
         self.yftf_path.config(state=NORMAL)
         self.yftf_path.delete(0, END)
         self.yftf_path.insert(0, self.yft_client_obj.yftf_dir_path)
@@ -114,7 +120,10 @@ class NewDownloadPage(Frame):
         download_button.grid(row=2, column=0, padx=10, pady=10)
 
     def choose_yftf_path(self):
-        self.yft_client_obj.yftf_path = tkFileDialog.askopenfilename(parent=self, initialdir="/", title='Please select the yftf file you want to download from')
+        self.yft_client_obj.yftf_path = tkFileDialog.askopenfilename(
+            parent=self, initialdir="/",
+            title='Please select the yftf file you want to download from')
+
         self.yftf_path.config(state=NORMAL)
         self.yftf_path.delete(0, END)
         self.yftf_path.insert(0, self.yft_client_obj.yftf_path)
@@ -157,7 +166,10 @@ class NewSharePage(Frame):
         share_button.grid(row=3, column=0, padx=10, pady=10)
 
     def choose_yftf_path(self):
-        self.yft_client_obj.shared_files_dir_path = tkFileDialog.askdirectory(parent=self, initialdir="/", title='Please select the directory which there are the files you want to share')
+        self.yft_client_obj.shared_files_dir_path = tkFileDialog.askdirectory(
+            parent=self, initialdir="/",
+            title='Please select the directory which there are the files you want to share')
+
         self.shared_files_dir_path.config(state=NORMAL)
         self.shared_files_dir_path.delete(0, END)
         self.shared_files_dir_path.insert(0, self.yft_client_obj.shared_files_dir_path)
@@ -194,7 +206,10 @@ class StopUploadPage(Frame):
         stop_button.grid(row=2, column=0, padx=10, pady=10)
 
     def choose_yftf_path(self):
-        self.yft_client_obj.yftf_path = tkFileDialog.askopenfilename(parent=self, initialdir="/", title='Please select the yftf file you want to stop download/upload')
+        self.yft_client_obj.yftf_path = tkFileDialog.askopenfilename(
+            parent=self, initialdir="/",
+            title='Please select the yftf file you want to stop download/upload')
+
         self.yftf_path.config(state=NORMAL)
         self.yftf_path.delete(0, END)
         self.yftf_path.insert(0, self.yft_client_obj.yftf_path)

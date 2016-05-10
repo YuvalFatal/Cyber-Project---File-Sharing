@@ -69,14 +69,13 @@ class ClientProtocol(object):
                     if file_piece_index < 0 or file_piece_index > len(shared_file_info["Pieces Hash"]) - 1:
                         continue
 
-                    if str(shared_file_info["Pieces Hash"][file_piece_index]) == data_hash or str(shared_file_info["Hash"]) == data_hash:
+                    if str(shared_file_info["Pieces Hash"][file_piece_index]) == data_hash or str(
+                            shared_file_info["Hash"]) == data_hash:
                         file_path = str(shared_file_info["Path"])
                         break
 
             if file_path:
                 break
-
-        print file_path
 
         if not file_path:
             return None

@@ -33,7 +33,8 @@ class YFTServer(object):
 
         return response
 
-    def start_server(self):
+    @staticmethod
+    def start_server():
         IOLoop.instance().start()
 
 

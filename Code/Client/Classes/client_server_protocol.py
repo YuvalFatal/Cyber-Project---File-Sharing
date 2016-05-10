@@ -1,7 +1,8 @@
 class ClientServerProtocol(object):
     @staticmethod
     def new_share_request(info_hash, peer_id, peer_ip, port):
-        return {"YFT-Peer-id": peer_id, "YFT-Peer-ip": peer_ip, "YFT-yftf-Hash": info_hash, "YFT-Peer-Status": str(0), "YFT-Upload-Piece": str(1), "YFT-Port": str(port)}
+        return {"YFT-Peer-id": peer_id, "YFT-Peer-ip": peer_ip, "YFT-yftf-Hash": info_hash, "YFT-Peer-Status": str(0),
+                "YFT-Upload-Piece": str(1), "YFT-Port": str(port)}
 
     @staticmethod
     def download_request(info_hash, peer_id, peer_ip, request_piece_index, finished_piece_index=None):
@@ -73,4 +74,5 @@ class ClientServerProtocol(object):
         if int(response_headers["Yft-Piece-Index"]) not in pieces_requested_index[response_headers["Yft-Info-Hash"]]:
             return 0, yftf_json["Info"]["Name"] + " - ERROR: You didn't requested this piece"
 
-        return 2, int(response_headers["Yft-Piece-Index"]), response_headers["Yft-Ip"], int(response_headers["Yft-Port"])
+        return 2, int(response_headers["Yft-Piece-Index"]), response_headers["Yft-Ip"], int(
+            response_headers["Yft-Port"])

@@ -4,8 +4,9 @@ from tornado.httpclient import AsyncHTTPClient
 import socket
 import clients_protocol
 import client_action
-import thread
-import hashlib
+
+
+# import thread
 
 
 class ClientWorker(object):
@@ -26,7 +27,8 @@ class ClientWorker(object):
             print "Error:", response.error
         else:
             if "Yft-Info-Hash" in response.headers.keys():
-                data = list(self.actions[response.headers["Yft-Info-Hash"]].handle_response(self.yftf_files, response.headers))
+                data = list(
+                    self.actions[response.headers["Yft-Info-Hash"]].handle_response(self.yftf_files, response.headers))
             elif "Yft-Error" in response.headers.keys():
                 print response.headers["Yft-Error"]
                 return
@@ -46,7 +48,8 @@ class ClientWorker(object):
                 piece_index = data[1]
                 uploader_ip = data[2]
                 uploader_port = data[3]
-                # thread.start_new_thread(self.download, (response.headers["Yft-Info-Hash"], piece_index, uploader_ip, uploader_port))
+                # thread.start_new_thread(self.download,
+                #                         (response.headers["Yft-Info-Hash"], piece_index, uploader_ip, uploader_port))
                 self.download(response.headers["Yft-Info-Hash"], piece_index, uploader_ip, uploader_port)
 
     @staticmethod
@@ -74,7 +77,8 @@ class ClientWorker(object):
 
         ClientWorker.send(sock, clients_protocol.ClientProtocol.request(info_hash, piece_index))
 
-        clients_protocol.ClientProtocol.handle_response(ClientWorker.receive(sock), self.actions[info_hash].pieces_requested_index, self.yftf_files)
+        clients_protocol.ClientProtocol.handle_response(ClientWorker.receive(sock),
+                                                        self.actions[info_hash].pieces_requested_index, self.yftf_files)
 
         self.actions[info_hash].pieces_requested_index[info_hash].remove(piece_index)
         self.actions[info_hash].finished_pieces_index.append(piece_index)
@@ -94,7 +98,6 @@ class ClientWorker(object):
         (client_socket, client_address) = server_socket.accept()
 
         data = clients_protocol.ClientProtocol.handle_request(ClientWorker.receive(client_socket), self.yftf_files)
-        print hashlib.sha1(data[40:]).hexdigest()
 
         ClientWorker.send(client_socket, data)
 
@@ -139,7 +142,8 @@ class ClientWorker(object):
     def add_action(self, command, yftf_files, info_hash, peer_id, peer_ip, port_range, num_workers, queue_size):
         self.yftf_files = yftf_files
 
-        self.actions.update({info_hash: client_action.ClientAction(command, yftf_files, info_hash, peer_id, peer_ip, port_range, num_workers, queue_size)})
+        self.actions.update({info_hash: client_action.ClientAction(command, yftf_files, info_hash, peer_id, peer_ip,
+                                                                   port_range, num_workers, queue_size)})
 
     def stop_action(self, info_hash):
         del self.actions[info_hash]

@@ -16,7 +16,8 @@ class ClientServerProtocol(object):
 
             self.yftf_files = dict()
             for info_hash in yftf_files_info_hash:
-                self.yftf_files.update({info_hash: shared_file_table.SharedFileTable(info_hash, self.saved_tables_path)})
+                self.yftf_files.update(
+                    {info_hash: shared_file_table.SharedFileTable(info_hash, self.saved_tables_path)})
 
             return
 
@@ -27,7 +28,8 @@ class ClientServerProtocol(object):
         if not request_headers:
             return {"YFT-Error": "You probably miss some headers"}
 
-        if {"Yft-Peer-Id", "Yft-Peer-Status", "Yft-Upload-Piece", "Yft-Yftf-Hash", "Yft-Port", "Yft-Peer-Ip"}.issubset(set(request_headers.keys())):
+        if {"Yft-Peer-Id", "Yft-Peer-Status", "Yft-Upload-Piece", "Yft-Yftf-Hash", "Yft-Port", "Yft-Peer-Ip"}.issubset(
+                set(request_headers.keys())):
             return self.handle_new_share(request_headers, request_body)
 
         if {"Yft-Info-Hash", "Yft-Peer-Id", "Yft-Peer-Ip", "Yft-Peer-Status"}.issubset(set(request_headers.keys())):
@@ -47,7 +49,8 @@ class ClientServerProtocol(object):
             if "Yft-Request-Piece-Index" in request_headers.keys():
                 return self.handle_downloader_request(request_headers)
 
-            if {"Yft-Port", "Yft-Upload-Piece"}.issubset(set(request_headers.keys())) and request_headers["Yft-Upload-Piece"] is str(1):
+            if {"Yft-Port", "Yft-Upload-Piece"}.issubset(set(request_headers.keys())) and request_headers[
+                    "Yft-Upload-Piece"] is str(1):
                 return self.handle_uploader_request(request_headers)
 
         return {"YFT-Error": "You probably miss some headers"}
@@ -56,10 +59,12 @@ class ClientServerProtocol(object):
         self.yftf_files[request_headers["Yft-Info-Hash"]].remove_peer(request_headers["Yft-Peer-Id"])
 
     def add_peer(self, request_headers):
-        self.yftf_files[request_headers["Yft-Info-Hash"]].add_peer(request_headers["Yft-Peer-Id"], request_headers["Yft-Peer-Ip"])
+        self.yftf_files[request_headers["Yft-Info-Hash"]].add_peer(request_headers["Yft-Peer-Id"],
+                                                                   request_headers["Yft-Peer-Ip"])
 
     def handle_finished_piece(self, request_headers):
-        self.yftf_files[request_headers["Yft-Info-Hash"]].add_piece(request_headers["Yft-Peer-Id"], map(int, str(request_headers["Yft-Finished-Piece-Index"]).replace("[", "").replace(']', '').split(', ')))
+        self.yftf_files[request_headers["Yft-Info-Hash"]].add_piece(request_headers["Yft-Peer-Id"], map(int, str(
+            request_headers["Yft-Finished-Piece-Index"]).replace("[", "").replace(']', '').split(', ')))
 
     def handle_downloader_request(self, request_headers):
         table = self.yftf_files[request_headers["Yft-Info-Hash"]]
@@ -69,14 +74,16 @@ class ClientServerProtocol(object):
         if not uploader_data:
             return {"YFT-Info-Hash": table.get_info_hash(), "YFT-Error": "Could not find an uploader"}
 
-        return {"YFT-Info-Hash": table.get_info_hash(), "YFT-Type": str(0), "YFT-ip": uploader_data[0], "YFT-Piece-Index": request_headers["Yft-Request-Piece-Index"], "YFT-Port": str(uploader_data[1])}
+        return {"YFT-Info-Hash": table.get_info_hash(), "YFT-Type": str(0), "YFT-ip": uploader_data[0],
+                "YFT-Piece-Index": request_headers["Yft-Request-Piece-Index"], "YFT-Port": str(uploader_data[1])}
 
     def handle_uploader_request(self, request_headers):
         table = self.yftf_files[request_headers["Yft-Info-Hash"]]
 
         table.set_peer_waiting(request_headers["Yft-Peer-Id"], int(request_headers["Yft-Port"]))
 
-        return {"YFT-Info-Hash": table.get_info_hash(), "YFT-Type": str(1), "YFT-Port": str(request_headers["Yft-Port"])}
+        return {"YFT-Info-Hash": table.get_info_hash(), "YFT-Type": str(1),
+                "YFT-Port": str(request_headers["Yft-Port"])}
 
     def handle_new_share(self, request_headers, request_body):
         if not request_body:
@@ -114,5 +121,6 @@ class ClientServerProtocol(object):
     def __del__(self):
         data_save_file = open("data_save.obj", 'wb')
 
-        data_save_file.write(json.dumps({"saved_tables_path": self.saved_tables_path, "yftf_files_info_hash": self.yftf_files.keys()}))
+        data_save_file.write(
+            json.dumps({"saved_tables_path": self.saved_tables_path, "yftf_files_info_hash": self.yftf_files.keys()}))
         data_save_file.close()

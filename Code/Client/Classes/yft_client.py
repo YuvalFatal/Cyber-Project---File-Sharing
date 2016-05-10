@@ -69,7 +69,11 @@ class YFTClient(object):
 
         self.yftf_files.update({info_hash: [yftf_json, self.downloads_dir_path]})
 
-        self.worker_object.add_action(0, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + (self.num_port_per_thread * self.thread_counter), self.start_port_from + (self.num_port_per_thread * (self.thread_counter + 1))), self.num_port_per_thread, self.num_port_per_thread * 10)
+        self.worker_object.add_action(0, self.yftf_files, info_hash, self.peer_id, self.peer_ip,
+                                      range(self.start_port_from + (self.num_port_per_thread * self.thread_counter),
+                                            self.start_port_from + (
+                                                self.num_port_per_thread * (self.thread_counter + 1))),
+                                      self.num_port_per_thread, self.num_port_per_thread * 10)
 
         self.thread_counter += 1
 
@@ -78,7 +82,8 @@ class YFTClient(object):
 
         yftf_creator.YftfCreator(self.shared_files_dir_path, self.yftf_dir_path, self.tracker_url)
 
-        yftf_file = open(os.path.join(self.yftf_dir_path, self.shared_files_dir_path.split('\\')[-1].split('.')[0] + ".yftf"), 'r')
+        yftf_file = open(
+            os.path.join(self.yftf_dir_path, self.shared_files_dir_path.split('\\')[-1].split('.')[0] + ".yftf"), 'r')
         yftf_data = yftf_file.read()
         yftf_json = json.loads(yftf_data)
         yftf_file.close()
@@ -87,7 +92,11 @@ class YFTClient(object):
 
         self.yftf_files.update({info_hash: [yftf_json, self.shared_files_dir_path]})
 
-        self.worker_object.add_action(1, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + (self.num_port_per_thread * self.thread_counter), self.start_port_from + (self.num_port_per_thread * (self.thread_counter + 1))), self.num_port_per_thread, self.num_port_per_thread * 10)
+        self.worker_object.add_action(1, self.yftf_files, info_hash, self.peer_id, self.peer_ip,
+                                      range(self.start_port_from + (self.num_port_per_thread * self.thread_counter),
+                                            self.start_port_from + (
+                                                self.num_port_per_thread * (self.thread_counter + 1))),
+                                      self.num_port_per_thread, self.num_port_per_thread * 10)
 
         self.thread_counter += 1
 
@@ -106,7 +115,11 @@ class YFTClient(object):
             print "ERROR: You don't upload this files"
             return
 
-        self.worker_object.add_action(2, self.yftf_files, info_hash, self.peer_id, self.peer_ip, range(self.start_port_from + (self.num_port_per_thread * self.thread_counter), self.start_port_from + (self.num_port_per_thread * (self.thread_counter + 1))), 1, self.num_port_per_thread * 10)
+        self.worker_object.add_action(2, self.yftf_files, info_hash, self.peer_id, self.peer_ip,
+                                      range(self.start_port_from + (self.num_port_per_thread * self.thread_counter),
+                                            self.start_port_from + (
+                                                self.num_port_per_thread * (self.thread_counter + 1))), 1,
+                                      self.num_port_per_thread * 10)
 
         self.worker_object.stop_action(info_hash)
 
@@ -114,9 +127,9 @@ class YFTClient(object):
 
     @staticmethod
     def get_host_ip():
-            sock = socket.socket()
-            sock.connect(("google.com", 80))
-            ip = sock.getsockname()[0]
-            sock.close()
+        sock = socket.socket()
+        sock.connect(("google.com", 80))
+        ip = sock.getsockname()[0]
+        sock.close()
 
-            return ip
+        return ip
