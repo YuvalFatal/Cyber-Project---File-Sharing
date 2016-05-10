@@ -54,8 +54,6 @@ class ClientProtocol(object):
         pieces_index_requested = requests[info_hash]
 
         data = response[40:40 + yftf_data["Info"]["Piece Length"]]
-        print len(data)
-        print pieces_index_requested
         data_hash = hashlib.sha1(data).hexdigest()
 
         file_path = str()
@@ -73,11 +71,7 @@ class ClientProtocol(object):
                     if file_piece_index < 0 or file_piece_index > len(shared_file_info["Pieces Hash"]) - 1:
                         continue
 
-                    print data_hash, 'd'
-                    print shared_file_info, 'f'
-
                     if str(shared_file_info["Pieces Hash"][file_piece_index]) == data_hash or str(shared_file_info["Hash"]) == data_hash:
-                        # file_path = "\\" + yftf_data["Info"]["Name"] + str(shared_file_info["Path"])
                         file_path = str(shared_file_info["Path"])
                         break
 
@@ -87,7 +81,17 @@ class ClientProtocol(object):
         if not file_path:
             return None
 
-        print file_path
+        directories = file_path.split('\\')[0:-1]
+
+        if not os.path.isdir(shared_files_dir_path + '\\' + yftf_data["Info"]["Name"]):
+            os.makedirs(shared_files_dir_path + '\\' + yftf_data["Info"]["Name"])
+
+        shared_files_dir_path += '\\' + yftf_data["Info"]["Name"]
+
+        for directory in directories:
+            if not os.path.isdir(shared_files_dir_path + '\\' + directory):
+                os.makedirs(shared_files_dir_path + '\\' + directory)
+
         shared_file = open(shared_files_dir_path + file_path, 'wb')
         shared_file.seek(file_piece_index * yftf_data["Info"]["Piece Length"])
         shared_file.write(data)

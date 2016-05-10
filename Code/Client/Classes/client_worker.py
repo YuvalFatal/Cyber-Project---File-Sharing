@@ -86,6 +86,7 @@ class ClientWorker(object):
         self.actions[info_hash].port_range_in_use[port] = True
 
         server_socket = socket.socket()
+
         server_socket.bind(('0.0.0.0', port))
 
         server_socket.listen(1)
