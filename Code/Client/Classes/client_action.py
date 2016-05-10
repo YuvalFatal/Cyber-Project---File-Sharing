@@ -2,7 +2,7 @@ import hashlib
 import json
 from tornado.httpclient import HTTPRequest
 from tornado.httputil import HTTPHeaders
-from random import randint
+# from random import randint
 import client_server_protocol
 
 
@@ -150,4 +150,5 @@ class ClientAction(object):
     def handle_response(self, yftf_files, response_headers):
         self.yftf_files = yftf_files
 
-        return client_server_protocol.ClientServerProtocol.handle_response(self.yftf_files, self.pieces_requested_index, response_headers)
+        return client_server_protocol.ClientServerProtocol.handle_response(self.yftf_files, self.pieces_requested_index,
+                                                                           response_headers)
