@@ -114,6 +114,15 @@ class ClientWorker(object):
 
         server_socket = socket.socket()
 
+        # temp_sock = socket.socket()
+        #
+        # if temp_sock.connect_ex(("127.0.0.1", port)) == 0:
+        #     print "Error: Port is in use."
+        #     temp_sock.close()
+        #     return
+        #
+        # temp_sock.close()
+
         server_socket.bind(('0.0.0.0', port))
 
         server_socket.listen(1)
