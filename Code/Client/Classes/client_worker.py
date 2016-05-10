@@ -94,6 +94,7 @@ class ClientWorker(object):
         (client_socket, client_address) = server_socket.accept()
 
         data = clients_protocol.ClientProtocol.handle_request(ClientWorker.receive(client_socket), self.yftf_files)
+        print hashlib.sha1(data[40:]).hexdigest()
 
         ClientWorker.send(client_socket, data)
 

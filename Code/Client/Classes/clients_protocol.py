@@ -21,7 +21,7 @@ class ClientProtocol(object):
         for shared_file_info in yftf_data["Info"]["Files"]:
             pieces_counter += len(shared_file_info["Pieces Hash"])
 
-            if pieces_counter >= piece_index:
+            if pieces_counter > piece_index:
                 file_piece_index = piece_index - (pieces_counter - len(shared_file_info["Pieces Hash"]))
                 file_path = shared_file_info["Path"]
                 break
@@ -43,7 +43,7 @@ class ClientProtocol(object):
     @staticmethod
     def handle_response(response, requests, yftf_files):
         info_hash = response[0:40]
-        
+
         if info_hash not in yftf_files.keys() and info_hash not in requests.keys():
             return None
 
