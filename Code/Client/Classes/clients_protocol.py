@@ -1,10 +1,20 @@
+"""
+The file of the protocol between the clients.
+"""
 import os
 import hashlib
 
 
 class ClientProtocol(object):
+    """
+    The class of the protocol between the clients.
+    """
+
     @staticmethod
     def handle_request(request, yftf_files):
+        """
+        Handling a request from a downloader.
+        """
         info_hash = request[0:40]
         piece_index = int(request[40:48])
 
@@ -38,10 +48,16 @@ class ClientProtocol(object):
 
     @staticmethod
     def request(info_hash, piece_index):
+        """
+        Request from a downloader to uploader.
+        """
         return info_hash + str(piece_index).zfill(8)
 
     @staticmethod
     def handle_response(response, requests, yftf_files):
+        """
+        Handling a response from uploader.
+        """
         info_hash = response[0:40]
 
         if info_hash not in yftf_files.keys() and info_hash not in requests.keys():

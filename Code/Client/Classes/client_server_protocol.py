@@ -1,11 +1,26 @@
+"""
+The client server protocol file (client side).
+"""
+
+
 class ClientServerProtocol(object):
+    """
+    The client server protocol class.
+    """
+
     @staticmethod
     def new_share_request(info_hash, peer_id, peer_ip, port):
+        """
+        Making new share request to the server.
+        """
         return {"YFT-Peer-id": peer_id, "YFT-Peer-ip": peer_ip, "YFT-yftf-Hash": info_hash, "YFT-Peer-Status": str(0),
                 "YFT-Upload-Piece": str(1), "YFT-Port": str(port)}
 
     @staticmethod
     def download_request(info_hash, peer_id, peer_ip, request_piece_index, finished_piece_index=None):
+        """
+        Making download request to the server.
+        """
         headers = ClientServerProtocol.basic_request(info_hash, peer_id, peer_ip)
         headers.update({"YFT-Peer-Status": str(1), "YFT-Request-Piece-Index": str(request_piece_index)})
 
@@ -21,6 +36,9 @@ class ClientServerProtocol(object):
 
     @staticmethod
     def upload_request(info_hash, peer_id, peer_ip, port, finished_piece_index=None):
+        """
+        Making upload request to the server.
+        """
         headers = ClientServerProtocol.basic_request(info_hash, peer_id, peer_ip)
         headers.update({"YFT-Peer-Status": str(1), "YFT-Upload-Piece": str(1), "YFT-Port": str(port)})
 
@@ -36,6 +54,9 @@ class ClientServerProtocol(object):
 
     @staticmethod
     def start_new_download_request(info_hash, peer_id, peer_ip, request_piece_index):
+        """
+        Starting new download request to the server.
+        """
         headers = ClientServerProtocol.basic_request(info_hash, peer_id, peer_ip)
         headers.update({"YFT-Peer-Status": str(0), "YFT-Request-Piece-Index": str(request_piece_index)})
 
@@ -43,6 +64,9 @@ class ClientServerProtocol(object):
 
     @staticmethod
     def finish_sharing_request(info_hash, peer_id, peer_ip):
+        """
+        Finished sharing request to the server.
+        """
         headers = ClientServerProtocol.basic_request(info_hash, peer_id, peer_ip)
         headers.update({"YFT-Peer-Status": str(2)})
 
@@ -50,10 +74,16 @@ class ClientServerProtocol(object):
 
     @staticmethod
     def basic_request(info_hash, peer_id, peer_ip):
+        """
+        Basic request to the server.
+        """
         return {"YFT-Info-Hash": info_hash, "YFT-Peer-id": peer_id, "YFT-Peer-ip": peer_ip}
 
     @staticmethod
     def handle_response(yftf_files, pieces_requested_index, response_headers):
+        """
+        Handle response from the server.
+        """
         if "Yft-Info-Hash" not in response_headers.keys() or response_headers["Yft-Info-Hash"] not in yftf_files.keys():
             return 0, "ERROR: Response not valid"
 
