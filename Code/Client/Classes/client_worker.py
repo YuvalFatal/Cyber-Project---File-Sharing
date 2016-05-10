@@ -4,8 +4,6 @@ from tornado.httpclient import AsyncHTTPClient
 import socket
 import clients_protocol
 import client_action
-
-
 # import thread
 
 

@@ -1,3 +1,6 @@
+"""
+Manging the client actions file.
+"""
 import hashlib
 import json
 from tornado.httpclient import HTTPRequest
@@ -7,7 +10,15 @@ import client_server_protocol
 
 
 class ClientAction(object):
+    """
+    The class the manage the client actions.
+    """
+
     def __init__(self, command, yftf_files, info_hash, peer_id, peer_ip, port_range, num_workers, queue_size):
+        """
+        Starting a new action.
+        """
+
         self.peer_id = peer_id
         self.peer_ip = peer_ip
         self.port_range_in_use = dict(zip(port_range, [False] * len(port_range)))
@@ -25,10 +36,16 @@ class ClientAction(object):
         self.command = command
 
     def basic_request(self, headers):
+        """
+        Basic request to server.
+        """
         return HTTPRequest(url=self.yftf_files[self.info_hash][0]["Announce"], method="GET",
                            headers=HTTPHeaders(headers), allow_nonstandard_methods=True)
 
     def find_unused_port(self):
+        """
+        Finding unused port.
+        """
         port = int()
 
         for port, in_use in self.port_range_in_use.iteritems():
@@ -38,6 +55,9 @@ class ClientAction(object):
         return port
 
     def upload_request(self):
+        """
+        Upload request to server.
+        """
         port = self.find_unused_port()
 
         if not port:
@@ -61,6 +81,9 @@ class ClientAction(object):
         return req
 
     def request(self):
+        """
+        Getting the right request of the action.
+        """
         if self.num_requests is 0 and self.command is 0:
             req = self.basic_request(
                 client_server_protocol.ClientServerProtocol.start_new_download_request(self.info_hash, self.peer_id,
@@ -148,6 +171,9 @@ class ClientAction(object):
                 return req
 
     def handle_response(self, yftf_files, response_headers):
+        """
+        Handling the response from the server.
+        """
         self.yftf_files = yftf_files
 
         return client_server_protocol.ClientServerProtocol.handle_response(self.yftf_files, self.pieces_requested_index,

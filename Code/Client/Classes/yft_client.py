@@ -1,3 +1,6 @@
+"""
+The file that manages the client.
+"""
 import socket
 import random
 import string
@@ -10,7 +13,14 @@ import thread
 
 
 class YFTClient(object):
+    """
+    The class the manages the client.
+    """
+
     def __init__(self):
+        """
+        Starting new client.
+        """
         self.peer_id = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(20))
         self.peer_ip = YFTClient.get_host_ip()
 
@@ -32,6 +42,9 @@ class YFTClient(object):
         thread.start_new_thread(self.worker_object.start_client, ())
 
     def new_action(self):
+        """
+        Client new action.
+        """
         if self.command is -1:
             return
 
@@ -48,12 +61,18 @@ class YFTClient(object):
             return
 
     def correct_path(self):
+        """
+        Correcting the path string.
+        """
         self.downloads_dir_path = self.downloads_dir_path.replace('/', '\\')
         self.yftf_dir_path = self.yftf_dir_path.replace('/', '\\')
         self.yftf_path = self.yftf_path.replace('/', '\\')
         self.shared_files_dir_path = self.shared_files_dir_path.replace('/', '\\')
 
     def new_download(self):
+        """
+        Action of new download.
+        """
         self.correct_path()
 
         if not os.path.isfile(self.yftf_path):
@@ -78,6 +97,9 @@ class YFTClient(object):
         self.thread_counter += 1
 
     def new_share(self):
+        """
+        Action of new share.
+        """
         self.correct_path()
 
         yftf_creator.YftfCreator(self.shared_files_dir_path, self.yftf_dir_path, self.tracker_url)
@@ -101,6 +123,9 @@ class YFTClient(object):
         self.thread_counter += 1
 
     def stop_upload(self):
+        """
+        Action of stop upload/download.
+        """
         self.correct_path()
 
         shared_file_name = self.yftf_path.split('\\')[-1].split('.')[0]
@@ -127,6 +152,9 @@ class YFTClient(object):
 
     @staticmethod
     def get_host_ip():
+        """
+        Gets the client ip.
+        """
         sock = socket.socket()
         sock.connect(("google.com", 80))
         ip = sock.getsockname()[0]
