@@ -54,6 +54,8 @@ class ClientProtocol(object):
         pieces_index_requested = requests[info_hash]
 
         data = response[40:40 + yftf_data["Info"]["Piece Length"]]
+        print len(data)
+        print pieces_index_requested
         data_hash = hashlib.sha1(data).hexdigest()
 
         file_path = str()
@@ -73,8 +75,7 @@ class ClientProtocol(object):
 
                     print data_hash, 'd'
                     print shared_file_info, 'f'
-                    print file_piece_index, 'i'
-                    print piece_index, 'g'
+
                     if str(shared_file_info["Pieces Hash"][file_piece_index]) == data_hash or str(shared_file_info["Hash"]) == data_hash:
                         # file_path = "\\" + yftf_data["Info"]["Name"] + str(shared_file_info["Path"])
                         file_path = str(shared_file_info["Path"])

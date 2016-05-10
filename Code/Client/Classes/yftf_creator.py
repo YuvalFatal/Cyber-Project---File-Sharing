@@ -126,12 +126,13 @@ class YftfCreator(object):
         """
         pieces_hashes = []
 
-        for piece in data[::self.piece_length]:
-            pieces_hashes.append(YftfCreator.get_data_hash(piece))
+        for index in range(0, (len(data) / self.piece_length) + 1):
+            if index == (len(data) / self.piece_length) + 1:
+                pieces_hashes.append(YftfCreator.get_data_hash(data[index * self.piece_length:]))
+            else:
+                pieces_hashes.append(YftfCreator.get_data_hash(data[index * self.piece_length:(index + 1) * self.piece_length]))
 
             self.num_pieces += 1
-
-        self.num_pieces -= 1
 
         return pieces_hashes
 
