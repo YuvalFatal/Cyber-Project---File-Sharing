@@ -8,8 +8,6 @@ class ClientProtocol(object):
         info_hash = request[0:40]
         piece_index = int(request[40:48])
 
-        print piece_index
-
         if info_hash not in yftf_files.keys():
             return None
 
@@ -45,7 +43,7 @@ class ClientProtocol(object):
     @staticmethod
     def handle_response(response, requests, yftf_files):
         info_hash = response[0:40]
-        print requests
+        
         if info_hash not in yftf_files.keys() and info_hash not in requests.keys():
             return None
 
@@ -77,6 +75,8 @@ class ClientProtocol(object):
 
             if file_path:
                 break
+
+        print file_path
 
         if not file_path:
             return None
