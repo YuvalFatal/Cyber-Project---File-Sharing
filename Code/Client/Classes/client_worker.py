@@ -1,3 +1,6 @@
+"""
+The client worker file.
+"""
 from tornado.ioloop import IOLoop
 from tornado import gen, queues
 from tornado.httpclient import AsyncHTTPClient
@@ -8,7 +11,14 @@ import client_action
 
 
 class ClientWorker(object):
+    """
+    The class that manages the client worker.
+    """
+
     def __init__(self, yftf_files, num_workers, queue_size):
+        """
+        Organize the client worker.
+        """
         self.yftf_files = yftf_files
 
         self.num_workers = num_workers
@@ -21,6 +31,9 @@ class ClientWorker(object):
         self.http_client = AsyncHTTPClient()
 
     def handle_response(self, response):
+        """
+        Handling the response from the server.
+        """
         if response.error:
             print "Error:", response.error
         else:
@@ -52,6 +65,9 @@ class ClientWorker(object):
 
     @staticmethod
     def send(sock, data):
+        """
+        Sending data to a client.
+        """
         length = len(data)
         length = str(length).zfill(8)
 
@@ -59,6 +75,9 @@ class ClientWorker(object):
 
     @staticmethod
     def receive(sock):
+        """
+        Receiving data from a client.
+        """
         length = int(sock.recv(8))
         data = ""
         while length != 0:
@@ -69,6 +88,9 @@ class ClientWorker(object):
 
     @gen.coroutine
     def download(self, info_hash, piece_index, uploader_ip, uploader_port):
+        """
+        Download the data from a client.
+        """
         sock = socket.socket()
         sock.settimeout(30)
         sock.connect((uploader_ip, uploader_port))
@@ -85,6 +107,9 @@ class ClientWorker(object):
 
     @gen.coroutine
     def upload(self, info_hash, port):
+        """
+        Uploading data to a client.
+        """
         self.actions[info_hash].port_range_in_use[port] = True
 
         server_socket = socket.socket()
@@ -106,6 +131,9 @@ class ClientWorker(object):
 
     @gen.coroutine
     def worker(self):
+        """
+        Sending request to the server.
+        """
         while True:
             req = yield self.queue.get()
 
@@ -117,6 +145,9 @@ class ClientWorker(object):
 
     @gen.coroutine
     def do_work(self):
+        """
+        Starting the workers.
+        """
         for worker in range(self.num_workers):
             IOLoop.current().spawn_callback(self.worker)
 
@@ -135,13 +166,22 @@ class ClientWorker(object):
         yield self.queue.join()
 
     def start_client(self):
+        """
+        Starting the client worker.
+        """
         IOLoop.current().run_sync(self.do_work)
 
     def add_action(self, command, yftf_files, info_hash, peer_id, peer_ip, port_range, num_workers, queue_size):
+        """
+        Adding an action to the client worker.
+        """
         self.yftf_files = yftf_files
 
         self.actions.update({info_hash: client_action.ClientAction(command, yftf_files, info_hash, peer_id, peer_ip,
                                                                    port_range, num_workers, queue_size)})
 
     def stop_action(self, info_hash):
+        """
+        Stopping an action.
+        """
         del self.actions[info_hash]
