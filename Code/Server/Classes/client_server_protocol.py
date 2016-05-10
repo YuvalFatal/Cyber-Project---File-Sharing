@@ -1,3 +1,6 @@
+"""
+The file of the protocol between the client and the server.
+"""
 import hashlib
 import json
 import shared_file_table
@@ -5,7 +8,14 @@ import os
 
 
 class ClientServerProtocol(object):
+    """
+    The class of the protocol between the client and server (server side).
+    """
+
     def __init__(self, saved_tables_path):
+        """
+        Sets the protocol needed information.
+        """
         if os.path.isfile("data_save.obj"):
             data_save_file = open("data_save.obj", 'rb')
             saved_data = json.loads(data_save_file.read())
@@ -25,6 +35,9 @@ class ClientServerProtocol(object):
         self.yftf_files = dict()
 
     def handle_request(self, request_headers, request_body=""):
+        """
+        Handle request.
+        """
         if not request_headers:
             return {"YFT-Error": "You probably miss some headers"}
 
@@ -56,17 +69,29 @@ class ClientServerProtocol(object):
         return {"YFT-Error": "You probably miss some headers"}
 
     def remove_peer(self, request_headers):
+        """
+        Removes peer from the right table.
+        """
         self.yftf_files[request_headers["Yft-Info-Hash"]].remove_peer(request_headers["Yft-Peer-Id"])
 
     def add_peer(self, request_headers):
+        """
+        Adding peer to the right table.
+        """
         self.yftf_files[request_headers["Yft-Info-Hash"]].add_peer(request_headers["Yft-Peer-Id"],
                                                                    request_headers["Yft-Peer-Ip"])
 
     def handle_finished_piece(self, request_headers):
+        """
+        Handle finished piece from peer.
+        """
         self.yftf_files[request_headers["Yft-Info-Hash"]].add_piece(request_headers["Yft-Peer-Id"], map(int, str(
             request_headers["Yft-Finished-Piece-Index"]).replace("[", "").replace(']', '').split(', ')))
 
     def handle_downloader_request(self, request_headers):
+        """
+        Handling a download request from peer.
+        """
         table = self.yftf_files[request_headers["Yft-Info-Hash"]]
 
         uploader_data = table.find_uploader(int(request_headers["Yft-Request-Piece-Index"]))
@@ -78,6 +103,9 @@ class ClientServerProtocol(object):
                 "YFT-Piece-Index": request_headers["Yft-Request-Piece-Index"], "YFT-Port": str(uploader_data[1])}
 
     def handle_uploader_request(self, request_headers):
+        """
+        Handling upload request from peer.
+        """
         table = self.yftf_files[request_headers["Yft-Info-Hash"]]
 
         table.set_peer_waiting(request_headers["Yft-Peer-Id"], int(request_headers["Yft-Port"]))
@@ -86,6 +114,9 @@ class ClientServerProtocol(object):
                 "YFT-Port": str(request_headers["Yft-Port"])}
 
     def handle_new_share(self, request_headers, request_body):
+        """
+        Handle new share from peer.
+        """
         if not request_body:
             return {"YFT-Error": "There is no yftf file in body"}
 
@@ -119,6 +150,9 @@ class ClientServerProtocol(object):
         return {"YFT-Info-Hash": info_hash, "YFT-Type": str(1), "YFT-Port": str(request_headers["Yft-Port"])}
 
     def __del__(self):
+        """
+        When delete the protocol, it saves its information.
+        """
         data_save_file = open("data_save.obj", 'wb')
 
         data_save_file.write(
