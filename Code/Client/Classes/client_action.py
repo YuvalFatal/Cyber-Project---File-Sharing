@@ -44,9 +44,14 @@ class ClientAction(object):
             return
 
         if len(self.finished_pieces_index) > 0:
+            if len(self.finished_pieces_index) == 1:
+                finished_piece = self.finished_pieces_index[0]
+            else:
+                finished_piece = self.finished_pieces_index
+
             req = self.basic_request(
                 client_server_protocol.ClientServerProtocol.upload_request(self.info_hash, self.peer_id, self.peer_ip,
-                                                                           port, self.finished_pieces_index))
+                                                                           port, finished_piece))
             self.finished_pieces_index = list()
         else:
             req = self.basic_request(
@@ -65,7 +70,7 @@ class ClientAction(object):
                 self.pieces_requested_index.update({self.info_hash: []})
 
             self.pieces_requested_index[self.info_hash] += [self.num_requests]
-            # self.num_requests += 1
+            self.num_requests += 1
 
             return req
 
@@ -116,11 +121,19 @@ class ClientAction(object):
             #
             # else:
             if len(self.finished_pieces_index) > 0:
+                if len(self.finished_pieces_index) == 1:
+                    finished_piece = self.finished_pieces_index[0]
+                else:
+                    finished_piece = self.finished_pieces_index
+
                 req = self.basic_request(
                     client_server_protocol.ClientServerProtocol.download_request(self.info_hash, self.peer_id,
                                                                                  self.peer_ip, self.num_requests,
-                                                                                 self.finished_pieces_index))
+                                                                                 finished_piece))
                 self.finished_pieces_index = list()
+
+                self.pieces_requested_index[self.info_hash] += [self.num_requests]
+                self.num_requests += 1
 
                 return req
 
@@ -130,7 +143,7 @@ class ClientAction(object):
                                                                                  self.peer_ip, self.num_requests))
 
                 self.pieces_requested_index[self.info_hash] += [self.num_requests]
-                # self.num_requests += 1
+                self.num_requests += 1
 
                 return req
 

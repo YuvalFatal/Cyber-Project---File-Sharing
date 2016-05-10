@@ -59,7 +59,7 @@ class ClientServerProtocol(object):
         self.yftf_files[request_headers["Yft-Info-Hash"]].add_peer(request_headers["Yft-Peer-Id"], request_headers["Yft-Peer-Ip"])
 
     def handle_finished_piece(self, request_headers):
-        self.yftf_files[request_headers["Yft-Info-Hash"]].add_piece(map(int, request_headers["Yft-Finished-Piece-Index"].split(', ')))
+        self.yftf_files[request_headers["Yft-Info-Hash"]].add_piece(request_headers["Yft-Peer-Id"], map(int, str(request_headers["Yft-Finished-Piece-Index"]).replace("[", "").replace(']', '').split(', ')))
 
     def handle_downloader_request(self, request_headers):
         table = self.yftf_files[request_headers["Yft-Info-Hash"]]
